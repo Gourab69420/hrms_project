@@ -1,0 +1,198 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Apply Leave - HRMS Portal</title>
+<!-- Tailwind CSS CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Custom Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f5ff',
+              100: '#e0ebff',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              800: '#1e3a8a',
+              900: '#0f2460',
+            },
+            surface: '#f8fafc',
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<!-- Font and Custom Polish Styles -->
+<style data-purpose="typography">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+<style data-purpose="custom-layout">
+    /* Custom scrollbar suppression for pure mobile application look */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    * {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" data-snapdom="injected-import"></head>
+<body class="bg-slate-100 flex justify-center items-center min-h-screen text-slate-800 antialiased p-0 sm:p-4">
+<!-- Mobile Frame Container (iPhone 390px spec) -->
+<div class="w-full max-w-[390px] h-[844px] bg-[#f8f9ff] flex flex-col justify-between relative shadow-2xl rounded-none sm:rounded-[40px] overflow-hidden border border-slate-200">
+<!-- BEGIN: MobileStatusBar -->
+<div class="w-full pt-3 px-6 pb-2 flex justify-between items-center text-xs font-semibold text-slate-700 select-none z-20 bg-white">
+<span class="">9:41</span>
+<div class="flex items-center space-x-1.5">
+<svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 18.25A9.956 9.956 0 012 12C2 6.48 6.48 2 12 2s10 4.48 10 10c0 2.32-.8 4.45-2.14 6.15l-.62-.62A8.966 8.966 0 0021 12c0-4.97-4.03-9-9-9zm0 4c-2.76 0-5 2.24-5 5 0 1.25.46 2.39 1.22 3.28l.71-.71A3.978 3.978 0 018 12c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .94-.33 1.8-.88 2.47l.71.71c.95-1.03 1.52-2.39 1.52-3.88 0-2.76-2.24-5-5-5z"></path></svg>
+<svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0012 4z"></path></svg>
+<div class="w-5 h-2.5 border border-slate-700 rounded-sm p-0.5 flex items-center">
+<div class="h-full bg-slate-700 w-3 rounded-2xs"></div>
+</div>
+</div>
+</div>
+<!-- END: MobileStatusBar -->
+<!-- BEGIN: Header -->
+<header class="bg-white px-5 py-3.5 flex items-center justify-between border-b border-slate-200/80 sticky top-0 z-10 shadow-xs">
+<div class="flex items-center space-x-3">
+<!-- Back Navigation Button -->
+<a aria-label="Go back" class="p-1 -ml-1 text-slate-700 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors" href="#">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24">
+<line x1="19" x2="5" y1="12" y2="12"></line>
+<polyline points="12 19 5 12 12 5"></polyline>
+</svg>
+</a>
+<h1 class="text-xl font-bold tracking-tight text-slate-900">Apply Leave</h1>
+</div>
+<!-- Leave Balance Pill Badge -->
+<div class="text-[11px] font-semibold tracking-wide bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full border border-blue-200/60">
+        14 Days Left
+      </div>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+<!-- Sub-headline Contextual Box -->
+<section class="flex items-center justify-between px-1">
+<div>
+<span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">Self Service</span>
+<h2 class="text-base font-semibold text-slate-800">New Request</h2>
+</div>
+
+</section>
+<!-- Main Form Section -->
+<section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/90 space-y-4" data-purpose="leave-application-form">
+<form class="space-y-4" id="applyLeaveForm" onsubmit="event.preventDefault();">
+<!-- 1. Leave Type Selector (ER: LEAVE_TYPE / leave_type_id) -->
+<div class="space-y-1.5">
+<label class="block text-xs font-semibold text-slate-700" for="leave_type">
+              Leave Type <span class="text-rose-500">*</span>
+</label>
+<div class="relative">
+<select class="block w-full rounded-xl border-slate-200 bg-slate-50/70 text-slate-800 text-sm font-medium py-2.5 px-3 pr-10 focus:border-brand-600 focus:bg-white focus:ring-1 focus:ring-brand-600 transition-all appearance-none" id="leave_type" name="leave_type_id" required="">
+<option disabled="" selected="" value="">Select leave type (sick / casual / annual)</option>
+<option value="1">Sick Leave</option>
+<option value="2">Casual Leave</option>
+<option value="3">Annual Leave</option>
+<option value="4">Medical Leave</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+</div>
+<!-- 2. Date Pickers Grid (ER: start_date, end_date) -->
+<div class="grid grid-cols-2 gap-3">
+<!-- Start Date -->
+<div class="space-y-1.5">
+<label class="block text-xs font-semibold text-slate-700" for="start_date">
+                Start Date <span class="text-rose-500">*</span>
+</label>
+<div class="relative">
+<input class="block w-full rounded-xl border-slate-200 bg-slate-50/70 text-slate-800 text-xs font-medium py-2.5 px-3 focus:border-brand-600 focus:bg-white focus:ring-1 focus:ring-brand-600 transition-all" id="start_date" name="start_date" required="" type="date" value="2026-09-28">
+</div>
+</div>
+<!-- End Date -->
+<div class="space-y-1.5">
+<label class="block text-xs font-semibold text-slate-700" for="end_date">
+                End Date <span class="text-rose-500">*</span>
+</label>
+<div class="relative">
+<input class="block w-full rounded-xl border-slate-200 bg-slate-50/70 text-slate-800 text-xs font-medium py-2.5 px-3 focus:border-brand-600 focus:bg-white focus:ring-1 focus:ring-brand-600 transition-all" id="end_date" name="end_date" required="" type="date" value="2026-09-29">
+</div>
+</div>
+</div>
+<!-- 3. Total Days Badge (ER: total_days calculated summary) -->
+<div class="flex items-center justify-between bg-blue-50/60 border border-blue-100 rounded-xl px-3.5 py-2.5" data-purpose="leave-summary-badge">
+<div class="flex items-center space-x-2">
+<div class="p-1 rounded bg-blue-600 text-white">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<span class="text-xs font-medium text-slate-600">Calculated Duration</span>
+</div>
+<span class="text-xs font-bold text-brand-800 tracking-wide bg-white px-2 py-0.5 rounded shadow-xs border border-blue-200/50">2 Days</span>
+</div>
+<!-- 4. Reason Field (ER: reason) -->
+<div class="space-y-1.5">
+<label class="block text-xs font-semibold text-slate-700" for="reason">
+              Reason <span class="text-rose-500">*</span>
+</label>
+<textarea class="block w-full rounded-xl border-slate-200 bg-slate-50/70 text-slate-800 text-xs leading-relaxed py-2.5 px-3 focus:border-brand-600 focus:bg-white focus:ring-1 focus:ring-brand-600 transition-all placeholder:text-slate-400" id="reason" name="reason" placeholder="Enter reason for leave request (e.g. medical appointment, family commitments)..." required="" rows="3"></textarea>
+</div>
+<!-- Manager Workflow Notice Box -->
+<div class="flex items-start space-x-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-200/70 text-slate-500">
+<svg class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" x2="12" y1="16" y2="12"></line>
+<line x1="12" x2="12.01" y1="8" y2="8"></line>
+</svg>
+<p class="text-[11px] leading-tight text-slate-600">
+              Application will be routed automatically to your reporting manager for approval.
+            </p>
+</div>
+<!-- 5. Submit CTA Button -->
+<div class="pt-1">
+<button class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-800 active:scale-[0.98] text-white text-sm font-semibold rounded-xl shadow-md shadow-brand-500/25 flex items-center justify-center space-x-2 transition-all cursor-pointer" type="submit">
+<span class="">Submit Application</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</button>
+</div>
+</form>
+</section>
+<!-- Additional Quick Helper Card -->
+<section class="bg-white/80 border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between text-xs text-slate-600 shadow-2xs">
+<div class="flex items-center space-x-2.5">
+<div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<p class="font-semibold text-slate-800 text-[12px]">HR Leave Policy</p>
+<p class="text-[11px] text-slate-500">Plan 3 days in advance for annual leaves</p>
+</div>
+</div>
+<button class="text-brand-600 font-semibold text-xs hover:underline">View</button>
+</section>
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: BottomNavigationBar -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 py-2 px-4 shadow-lg"><div class="flex items-center justify-around w-full max-w-md mx-auto"><a href="#" class="flex flex-col items-center text-slate-500 hover:text-slate-900"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span class="text-xs">Home</span></a><a href="#" class="flex flex-col items-center text-slate-500 hover:text-slate-900"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"></circle><polyline points="12 6 12 12 16 14" stroke-width="2"></polyline></svg><span class="text-xs">Attendance</span></a><a href="#" class="flex flex-col items-center text-blue-800 font-semibold"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect><line x1="16" y1="2" x2="16" y2="6" stroke-width="2"></line><line x1="8" y1="2" x2="8" y2="6" stroke-width="2"></line><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"></line><path d="m9 16 2 2 4-4" stroke-width="2"></path></svg><span class="text-xs">Leaves</span></a><a href="#" class="flex flex-col items-center text-slate-500 hover:text-slate-900"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" stroke-width="2"></rect><circle cx="12" cy="12" r="2" stroke-width="2"></circle><path d="M6 12h.01M18 12h.01" stroke-width="2"></path></svg><span class="text-xs">Payroll</span></a><a href="#" class="flex flex-col items-center text-slate-500 hover:text-slate-900"><svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4" stroke-width="2"></circle></svg><span class="text-xs">Profile</span></a></div></nav>
+<!-- END: BottomNavigationBar -->
+<!-- iOS Home Indicator bar -->
+<div class="w-full pb-1 pt-0.5 flex justify-center bg-white">
+<div class="w-32 h-1 bg-slate-300 rounded-full"></div>
+</div>
+</div>
+
+
+
+
+</body></html>

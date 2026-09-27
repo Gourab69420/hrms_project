@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<title>HRMS - Employee Dashboard</title>
+<!-- Tailwind CSS v3 CDN with forms & container-queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            royal: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
+              800: '#1e3a8a',
+              900: '#172554',
+            },
+            surface: '#F8F9FD',
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          boxShadow: {
+            'card': '0 2px 8px -1px rgba(0, 0, 0, 0.04), 0 1px 4px -1px rgba(0, 0, 0, 0.02)',
+            'nav': '0 -3px 12px rgba(0, 0, 0, 0.05)',
+          }
+        }
+      }
+    }
+  </script>
+<!-- Google Font: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Core Page Styles -->
+<style data-purpose="base-styling">
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    /* iOS safe-area support */
+    .safe-top {
+      padding-top: env(safe-area-inset-top, 0.75rem);
+    }
+    .safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom, 1rem);
+    }
+  </style>
+<style data-purpose="button-feedback">
+    /* Subtle touch active feedback for mobile buttons */
+    .touch-press:active {
+      transform: scale(0.985);
+      background-color: #f1f5f9;
+    }
+    .pill-press:active {
+      transform: scale(0.96);
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex justify-center">
+<!-- BEGIN: MobileDeviceFrame -->
+<main class="w-full max-w-[430px] min-h-screen bg-[#F8F9FD] flex flex-col justify-between relative shadow-2xl border-x border-slate-200/60 pb-24">
+<!-- BEGIN: TopBar -->
+<header class="bg-white/95 backdrop-blur-md sticky top-0 z-20 px-6 pt-3 pb-3 border-b border-slate-100 flex items-center justify-between safe-top">
+<div class="flex items-center space-x-2">
+<h1 class="text-xl font-bold tracking-tight text-slate-900">Home</h1>
+</div>
+<!-- Subtle Notification Indicator -->
+<button aria-label="Notifications" class="p-2 -mr-2 text-slate-400 hover:text-slate-600 transition-colors relative">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+</svg>
+<span class="absolute top-2 right-2 w-2 h-2 bg-blue-600 rounded-full ring-2 ring-white"></span>
+</button>
+</header>
+<!-- END: TopBar -->
+<!-- Scrollable Content Area -->
+<div class="px-5 pt-5 pb-6 space-y-5 flex-1">
+<!-- BEGIN: UserGreetingSection -->
+<section class="px-1" data-purpose="user-greeting">
+<h2 class="text-2xl font-bold text-slate-900 tracking-tight">Hello, Gourab</h2>
+<p class="text-sm font-medium text-slate-400 mt-0.5 tracking-wide">Wed Sep 23 2026</p>
+</section>
+<!-- END: UserGreetingSection -->
+<!-- BEGIN: TodayAttendanceCard -->
+<section data-purpose="attendance-summary">
+<div class="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-card flex flex-col items-center justify-center text-center py-6 transition-all">
+<div class="w-10 h-10 rounded-full bg-blue-50 text-royal-800 flex items-center justify-center mb-2.5">
+<!-- Clock Icon -->
+<svg class="w-5 h-5 text-royal-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<h3 class="text-lg font-bold text-slate-900">Today's Attendance</h3>
+<p class="text-sm italic text-slate-400 mt-1 mb-3">No attendance recorded for today.</p>
+<!-- Punch In Quick Action Button -->
+<button class="pill-press inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold text-royal-800 bg-blue-50 hover:bg-blue-100 transition-colors border border-blue-100/60">
+<span class="w-2 h-2 rounded-full bg-amber-400 mr-2 animate-pulse"></span>
+            Punch In Now
+          </button>
+</div>
+</section>
+<!-- END: TodayAttendanceCard -->
+<!-- BEGIN: MetricCardsGrid -->
+<section class="grid grid-cols-2 gap-3.5" data-purpose="key-metrics-grid">
+<!-- Metric 1: Pending Leaves -->
+<div class="bg-white rounded-2xl p-4 border border-slate-200/70 shadow-card flex flex-col items-center justify-center text-center min-h-[110px]">
+<span class="text-3xl font-bold text-royal-600 tracking-tight leading-none mb-1.5">0</span>
+<span class="text-xs font-medium text-slate-400">Pending Leaves</span>
+</div>
+<!-- Metric 2: Last Net Salary -->
+<div class="bg-white rounded-2xl p-4 border border-slate-200/70 shadow-card flex flex-col items-center justify-center text-center min-h-[110px]">
+<span class="text-2xl font-bold text-royal-600 tracking-tight leading-none mb-1.5 truncate max-w-full px-1">
+            6,969,804
+          </span>
+<span class="text-xs font-medium text-slate-400">Last Net Salary</span>
+</div>
+</section>
+<!-- END: MetricCardsGrid -->
+<!-- BEGIN: QuickActionsSection -->
+<section class="pt-1" data-purpose="quick-actions-menu">
+<h3 class="text-base font-bold text-slate-900 mb-3 px-1">Quick Actions</h3>
+<div class="space-y-3">
+<!-- Action 1: My Attendance -->
+<button class="touch-press w-full bg-white rounded-xl py-3.5 px-5 border border-slate-200/70 shadow-card flex items-center justify-between transition-all group" type="button">
+<div class="flex items-center space-x-3.5">
+<div class="w-8 h-8 rounded-lg bg-blue-50/70 flex items-center justify-center text-royal-800">
+<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<span class="font-semibold text-royal-600 text-sm tracking-wide">My Attendance</span>
+</div>
+<svg class="w-4 h-4 text-slate-300 group-hover:text-royal-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+</button>
+<!-- Action 2: Apply Leave -->
+<button class="touch-press w-full bg-white rounded-xl py-3.5 px-5 border border-slate-200/70 shadow-card flex items-center justify-between transition-all group" type="button">
+<div class="flex items-center space-x-3.5">
+<div class="w-8 h-8 rounded-lg bg-blue-50/70 flex items-center justify-center text-royal-800">
+<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<span class="font-semibold text-royal-600 text-sm tracking-wide">Apply Leave</span>
+</div>
+<svg class="w-4 h-4 text-slate-300 group-hover:text-royal-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+</button>
+<!-- Action 3: My Leaves -->
+<button class="touch-press w-full bg-white rounded-xl py-3.5 px-5 border border-slate-200/70 shadow-card flex items-center justify-between transition-all group" type="button">
+<div class="flex items-center space-x-3.5">
+<div class="w-8 h-8 rounded-lg bg-blue-50/70 flex items-center justify-center text-royal-800">
+<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<span class="font-semibold text-royal-600 text-sm tracking-wide">My Leaves</span>
+</div>
+<svg class="w-4 h-4 text-slate-300 group-hover:text-royal-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+</button>
+<!-- Action 4: My Payroll -->
+<button class="touch-press w-full bg-white rounded-xl py-3.5 px-5 border border-slate-200/70 shadow-card flex items-center justify-between transition-all group" type="button">
+<div class="flex items-center space-x-3.5">
+<div class="w-8 h-8 rounded-lg bg-blue-50/70 flex items-center justify-center text-royal-800">
+<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<span class="font-semibold text-royal-600 text-sm tracking-wide">My Payroll</span>
+</div>
+<svg class="w-4 h-4 text-slate-300 group-hover:text-royal-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+</button>
+</div>
+</section>
+<!-- END: QuickActionsSection -->
+</div>
+<!-- BEGIN: BottomNavigation -->
+<nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 bg-white border-t border-slate-200 py-2 px-4 shadow-lg safe-bottom" data-purpose="mobile-bottom-bar">
+  <div class="flex items-center justify-around w-full max-w-md mx-auto">
+    <!-- Tab 1: Home (Active) -->
+    <a class="flex flex-col items-center justify-center text-blue-800 font-semibold" href="#home">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+      <span class="text-xs">Home</span>
+    </a>
+    <!-- Tab 2: Attendance (Inactive) -->
+    <a class="flex flex-col items-center justify-center text-slate-500 hover:text-slate-700 transition-colors" href="#attendance">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"></circle><polyline points="12 6 12 12 16 14" stroke-width="2"></polyline></svg>
+      <span class="text-xs">Attendance</span>
+    </a>
+    <!-- Tab 3: Leaves (Inactive) -->
+    <a class="flex flex-col items-center justify-center text-slate-500 hover:text-slate-700 transition-colors" href="#leaves">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="2"></rect><line x1="16" y1="2" x2="16" y2="6" stroke-width="2"></line><line x1="8" y1="2" x2="8" y2="6" stroke-width="2"></line><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"></line><path d="m9 16 2 2 4-4" stroke-width="2"></path></svg>
+      <span class="text-xs">Leaves</span>
+    </a>
+    <!-- Tab 4: Payroll (Inactive) -->
+    <a class="flex flex-col items-center justify-center text-slate-500 hover:text-slate-700 transition-colors" href="#payroll">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" stroke-width="2"></rect><circle cx="12" cy="12" r="2" stroke-width="2"></circle><path d="M6 12h.01M18 12h.01" stroke-width="2"></path></svg>
+      <span class="text-xs">Payroll</span>
+    </a>
+    <!-- Tab 5: Profile (Inactive) -->
+    <a class="flex flex-col items-center justify-center text-slate-500 hover:text-slate-700 transition-colors" href="#profile">
+      <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4" stroke-width="2"></circle></svg>
+      <span class="text-xs">Profile</span>
+    </a>
+  </div>
+</nav>
+<!-- END: BottomNavigation -->
+</main>
+<!-- END: MobileDeviceFrame -->
+
+
+</body></html>

@@ -1,0 +1,31 @@
+# ---------- secrets / local env ----------
+.env
+*.env.local
+HRMS2/.env
+hrms-mobile/.env
+
+# ---------- python ----------
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.egg-info/
+
+# ---------- node / expo ----------
+node_modules/
+.expo/
+dist/
+web-build/
+*.jks
+*.keystore
+
+# ---------- OS / editor ----------
+.DS_Store
+Thumbs.db
+__MACOSX/
+.vscode/
+.idea/
+
+# ---------- misc ----------
+*.log
+npm-debug.log*

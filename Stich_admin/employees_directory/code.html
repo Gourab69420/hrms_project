@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100vh;background-color:#f8f9ff;font-family:'Inter',sans-serif;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"surface-container-lowest":"#ffffff","tertiary":"#222a3e","on-background":"#0b1c30","on-surface-variant":"#444651","surface-container-low":"#eff4ff","on-tertiary-fixed-variant":"#3f465c","on-tertiary-container":"#a4acc5","inverse-primary":"#b6c4ff","on-secondary-fixed-variant":"#003ea8","surface-container":"#e5eeff","inverse-surface":"#213145","surface-dim":"#cbdbf5","on-tertiary":"#ffffff","outline-variant":"#c5c5d3","primary":"#00236f","tertiary-container":"#384055","secondary-container":"#316bf3","on-primary-container":"#90a8ff","secondary":"#0051d5","on-surface":"#0b1c30","error-container":"#ffdad6","primary-container":"#1e3a8a","on-primary-fixed-variant":"#264191","surface-variant":"#d3e4fe","surface-container-high":"#dce9ff","primary-fixed":"#dce1ff","secondary-fixed":"#dbe1ff","secondary-fixed-dim":"#b4c5ff","on-primary":"#ffffff","inverse-on-surface":"#eaf1ff","surface-container-highest":"#d3e4fe","on-error-container":"#93000a","surface":"#f8f9ff","on-error":"#ffffff","on-secondary":"#ffffff","on-primary-fixed":"#00164e","surface-tint":"#4059aa","tertiary-fixed-dim":"#bec6e0","on-secondary-fixed":"#00174b","surface-bright":"#f8f9ff","tertiary-fixed":"#dae2fd","primary-fixed-dim":"#b6c4ff","error":"#ba1a1a","on-tertiary-fixed":"#131b2e","background":"#f8f9ff","on-secondary-container":"#fefcff","outline":"#757682"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-sm":"0.5rem","space-xl":"1.5rem","space-lg":"1rem","space-xs":"0.25rem","space-md":"0.75rem","margin":"1rem","gutter":"1rem"},"fontFamily":{"label-sm":["Inter"],"label-md":["Inter"],"title-md":["Inter"],"title-sm":["Inter"],"headline-lg":["Inter"],"body-md":["Inter"],"headline-md":["Inter"],"headline-sm":["Inter"],"body-lg":["Inter"],"body-sm":["Inter"],"code-sm":["Inter"]},"fontSize":{"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.03em","fontWeight":"500"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"title-md":["16px",{"lineHeight":"22px","letterSpacing":"-0.005em","fontWeight":"600"}],"title-sm":["14px",{"lineHeight":"20px","fontWeight":"600"}],"headline-lg":["28px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-sm":["18px",{"lineHeight":"24px","letterSpacing":"-0.01em","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}],"code-sm":["12px",{"lineHeight":"16px","fontWeight":"500"}]}}}};</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface antialiased min-h-screen"><div class="max-w-md mx-auto min-h-screen relative flex flex-col bg-surface"><header class="fixed top-0 max-w-md w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center"><span class="material-symbols-outlined text-surface-container-lowest text-[18px]">corporate_fare</span></div><span class="font-title-md text-title-md text-on-surface tracking-tight">Employees</span></div><div class="flex items-center gap-space-xs"><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[22px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-xs"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-14 pb-24 px-margin bg-surface"><div class="flex flex-col w-full gap-space-lg">
+<!-- Top Stat Banner & Primary Action -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex items-center justify-between">
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">82 Employees</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1.5 mt-0.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+        79 on active roster • 3 on leave
+      </span>
+</div>
+<button aria-label="Add Employee" class="h-11 px-space-lg bg-primary-container hover:bg-primary text-on-primary rounded-lg flex items-center gap-space-xs font-title-sm text-title-sm transition-all shadow-sm active:scale-95 shrink-0" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add Staff</span>
+</button>
+</div>
+<!-- Search & Department Filter Stack -->
+<div class="flex flex-col gap-space-sm">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[20px] text-outline">search</span>
+<input class="w-full h-12 pl-11 pr-10 rounded-lg bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-md text-body-md shadow-sm outline-none transition-all focus:bg-surface-container-low" id="employee-search" placeholder="Search by name, role, department..." type="text"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface hidden" id="clear-search" type="button">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+</button>
+</div>
+<!-- Quick Department Pill Filters -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-1 -mx-margin px-margin no-scrollbar">
+<button class="dept-filter-btn active h-9 px-space-md rounded-full bg-primary text-on-primary font-label-md text-label-md shrink-0 flex items-center gap-1 shadow-sm transition-colors" data-dept="all" type="button">
+<span>All Staff</span>
+<span class="bg-on-primary/20 px-1.5 py-0.5 rounded-full text-[10px]">82</span>
+</button>
+<button class="dept-filter-btn h-9 px-space-md rounded-full bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant font-label-md text-label-md shrink-0 flex items-center gap-1 shadow-sm transition-colors" data-dept="it" type="button">
+<span>IT</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded-full text-[10px] text-on-surface">14</span>
+</button>
+<button class="dept-filter-btn h-9 px-space-md rounded-full bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant font-label-md text-label-md shrink-0 flex items-center gap-1 shadow-sm transition-colors" data-dept="engineering" type="button">
+<span>Engineering</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded-full text-[10px] text-on-surface">36</span>
+</button>
+<button class="dept-filter-btn h-9 px-space-md rounded-full bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant font-label-md text-label-md shrink-0 flex items-center gap-1 shadow-sm transition-colors" data-dept="people" type="button">
+<span>People Ops</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded-full text-[10px] text-on-surface">8</span>
+</button>
+<button class="dept-filter-btn h-9 px-space-md rounded-full bg-surface-container-lowest hover:bg-surface-container-low text-on-surface-variant font-label-md text-label-md shrink-0 flex items-center gap-1 shadow-sm transition-colors" data-dept="finance" type="button">
+<span>Finance</span>
+<span class="bg-surface-container px-1.5 py-0.5 rounded-full text-[10px] text-on-surface">11</span>
+</button>
+</div>
+</div>
+<!-- Employee Cards List -->
+<div class="flex flex-col gap-space-sm" id="employee-list">
+<!-- Employee 1 -->
+<div class="employee-card bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between gap-space-sm transition-transform active:scale-[0.99] cursor-pointer" data-dept="it" data-name="gourab samanta head of information technology">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary font-title-md text-title-md flex items-center justify-center font-semibold">
+            GS
+          </div>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white" style="background-color: #10B981;" title="Active"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface truncate font-semibold">Gourab Samanta</span>
+<span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-emerald-50 text-emerald-800" style="background-color: #ECFDF5; color: #065F46;">
+              Active
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Head of Information Technology</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium mt-0.5">IT Department • Remote</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<button aria-label="More options for Gourab Samanta" class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+</div>
+</div>
+<!-- Employee 2 -->
+<div class="employee-card bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between gap-space-sm transition-transform active:scale-[0.99] cursor-pointer" data-dept="engineering" data-name="aparna b software engineer">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container font-title-md text-title-md flex items-center justify-center font-semibold">
+            AB
+          </div>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white" style="background-color: #10B981;" title="Active"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface truncate font-semibold">Aparna B</span>
+<span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-emerald-50 text-emerald-800" style="background-color: #ECFDF5; color: #065F46;">
+              Active
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Software Engineer</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium mt-0.5">Engineering • HQ Floor 3</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<button aria-label="More options for Aparna B" class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+</div>
+</div>
+<!-- Employee 3 -->
+<div class="employee-card bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between gap-space-sm transition-transform active:scale-[0.99] cursor-pointer" data-dept="engineering" data-name="rahul singh backend developer">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-full bg-tertiary-container text-on-tertiary font-title-md text-title-md flex items-center justify-center font-semibold">
+            RS
+          </div>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white" style="background-color: #10B981;" title="Active"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface truncate font-semibold">Rahul Singh</span>
+<span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-emerald-50 text-emerald-800" style="background-color: #ECFDF5; color: #065F46;">
+              Active
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Backend Developer</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium mt-0.5">Engineering • HQ Floor 3</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<button aria-label="More options for Rahul Singh" class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+</div>
+</div>
+<!-- Employee 4 -->
+<div class="employee-card bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between gap-space-sm transition-transform active:scale-[0.99] cursor-pointer" data-dept="people" data-name="sarah jenkins hr specialist">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest text-primary font-title-md text-title-md flex items-center justify-center font-semibold">
+            SJ
+          </div>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white" style="background-color: #10B981;" title="Active"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface truncate font-semibold">Sarah Jenkins</span>
+<span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-emerald-50 text-emerald-800" style="background-color: #ECFDF5; color: #065F46;">
+              Active
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">HR Specialist</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium mt-0.5">People Ops • Floor 2</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<button aria-label="More options for Sarah Jenkins" class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+</div>
+</div>
+<!-- Employee 5 -->
+<div class="employee-card bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between gap-space-sm transition-transform active:scale-[0.99] cursor-pointer" data-dept="finance" data-name="david miller financial analyst">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-full bg-surface-container-high text-on-surface font-title-md text-title-md flex items-center justify-center font-semibold">
+            DM
+          </div>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white" style="background-color: #F59E0B;" title="On Leave"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-title-sm text-title-sm text-on-surface truncate font-semibold">David Miller</span>
+<span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full font-label-sm text-label-sm" style="background-color: #FFFBEB; color: #92400E;">
+              On Leave
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Financial Analyst</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium mt-0.5">Finance • Floor 4</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<button aria-label="More options for David Miller" class="w-9 h-9 rounded-lg flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Empty Search Result State -->
+<div class="hidden flex-col items-center justify-center py-12 px-margin text-center bg-surface-container-lowest rounded-xl shadow-sm" id="empty-state">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-secondary text-[24px]">person_search</span>
+</div>
+<span class="font-title-sm text-title-sm text-on-surface font-semibold">No employees found</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-[240px]">
+      We couldn't match any employee with that criteria. Check the spelling or reset filters.
+    </span>
+</div>
+<!-- Pagination / Load More Footer -->
+<div class="flex flex-col items-center gap-space-xs pt-space-xs">
+<button class="w-full h-12 rounded-xl bg-surface-container-lowest hover:bg-surface-container text-primary font-title-sm text-title-sm shadow-sm flex items-center justify-center gap-space-xs transition-all active:scale-[0.99]" id="load-more-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+<span>Load More Employees (77 remaining)</span>
+</button>
+<span class="font-label-sm text-label-sm text-outline">Showing 5 of 82 total team members</span>
+</div>
+</div>
+<script>
+  (function() {
+    const searchInput = document.getElementById('employee-search');
+    const clearBtn = document.getElementById('clear-search');
+    const cards = document.querySelectorAll('.employee-card');
+    const filterBtns = document.querySelectorAll('.dept-filter-btn');
+    const emptyState = document.getElementById('empty-state');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+
+    let currentDept = 'all';
+
+    function filterEmployees() {
+      const query = searchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const cardDept = card.dataset.dept;
+        const cardName = card.dataset.name.toLowerCase();
+
+        const matchesDept = (currentDept === 'all' || cardDept === currentDept);
+        const matchesQuery = query === '' || cardName.includes(query);
+
+        if (matchesDept && matchesQuery) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      if (visibleCount === 0) {
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+        if (loadMoreBtn) loadMoreBtn.parentElement.classList.add('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+        emptyState.classList.remove('flex');
+        if (loadMoreBtn) loadMoreBtn.parentElement.classList.remove('hidden');
+      }
+
+      if (query.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+    }
+
+    searchInput.addEventListener('input', filterEmployees);
+
+    clearBtn.addEventListener('click', function() {
+      searchInput.value = '';
+      filterEmployees();
+      searchInput.focus();
+    });
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        filterBtns.forEach(b => {
+          b.classList.remove('bg-primary', 'text-on-primary', 'active');
+          b.classList.add('bg-surface-container-lowest', 'text-on-surface-variant');
+        });
+
+        this.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant');
+        this.classList.add('bg-primary', 'text-on-primary', 'active');
+
+        currentDept = this.dataset.dept;
+        filterEmployees();
+      });
+    });
+
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', function() {
+        const origText = this.innerHTML;
+        this.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span><span>Fetching team members...</span>';
+        setTimeout(() => {
+          this.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span><span>Loaded All Records</span>';
+          this.classList.add('opacity-70', 'pointer-events-none');
+        }, 800);
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 max-w-md w-full z-50 pb-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_-1px_12px_rgba(0,0,0,0.05)]" data-active-classes="text-primary-container font-semibold"><div class="flex justify-around items-center h-14 px-space-xs"><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[22px]">dashboard</span><span class="font-label-sm text-label-sm mt-0.5">Dashboard</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] py-1 transition-colors text-primary-container font-semibold" data-path="employees" href="#"><span class="material-symbols-outlined text-[22px]">badge</span><span class="font-label-sm text-label-sm mt-0.5">Staff</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="attendance" href="#"><span class="material-symbols-outlined text-[22px]">event_available</span><span class="font-label-sm text-label-sm mt-0.5">Clock</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="leaves" href="#"><span class="material-symbols-outlined text-[22px]">time_to_leave</span><span class="font-label-sm text-label-sm mt-0.5">Leaves</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] py-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="payroll" href="#"><span class="material-symbols-outlined text-[22px]">payments</span><span class="font-label-sm text-label-sm mt-0.5">Payroll</span></a></div></nav></div></body></html>

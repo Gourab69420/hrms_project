@@ -1,0 +1,808 @@
+You are a senior full-stack software engineer helping me build a production-oriented HRMS (Human Resource Management System) for small to medium-sized businesses.
+
+I have provided two reference files:
+
+1. HRMS Technology Stack document
+2. HRMS ER Diagram
+
+You MUST use these files as the primary source of truth.
+
+IMPORTANT:
+- The ER diagram is the SOURCE OF TRUTH for the database structure.
+- Do not arbitrarily add, remove, rename, or restructure entities or relationships.
+- The UI should be simple, clean, modern, intuitive, and easy to use.
+- Avoid unnecessary complexity, excessive animations, excessive colors, and clutter.
+- Build the project incrementally and keep the code maintainable.
+- Do not generate a completely different architecture from what is specified below.
+
+==================================================
+1. PROJECT GOAL
+==================================================
+
+Build a complete HRMS mobile application that allows a company administrator to manage employees and HR operations, while employees have primarily read-only access to their own information.
+
+The application should be practical for small to medium-sized businesses and should focus on simplicity and usability.
+
+==================================================
+2. TECHNOLOGY STACK
+==================================================
+
+FRONTEND:
+- React Native
+
+BACKEND:
+- Python
+- FastAPI
+
+DATABASE:
+- PostgreSQL
+
+AUTHENTICATION:
+- JWT
+
+API:
+- FastAPI-based HTTP API
+
+The overall architecture is:
+
+React Native
+↓
+FastAPI
+↓
+PostgreSQL
+
+IMPORTANT:
+The previous architecture used Node.js/Express, but this project MUST use FastAPI with Python instead.
+
+Do NOT use Node.js or Express for the backend.
+
+The original technology document specifies React Native, REST/JWT communication, Node.js/Express, and PostgreSQL; for this implementation, replace Node.js/Express with FastAPI while preserving the rest of the architectural intent.
+
+==================================================
+3. DATABASE / ER DIAGRAM
+==================================================
+
+The attached ER diagram MUST be treated as the authoritative database design.
+
+The ER diagram contains these core entities:
+
+- COMPANY
+- USER
+- DEPARTMENT
+- DESIGNATION
+- EMPLOYEE
+- LEAVE
+- LEAVE_TYPE
+- ATTENDANCE
+- PAYROLL
+- PAYSLIP
+
+Follow the exact attributes, PKs, FKs, and relationships shown in the ER diagram.
+
+The current ER structure includes:
+
+COMPANY
+- company_id PK
+- name
+- email
+- sub_plan
+- created_on
+
+USER
+- u_id PK
+- comp_id FK
+- username UNIQUE
+- role: ADMIN / Employee
+
+DEPARTMENT
+- department_id PK
+- company_id FK
+- name
+- description
+
+DESIGNATION
+- designation_id PK
+- company_id FK
+- title
+- description
+
+EMPLOYEE
+- emp_id PK
+- dep_id FK
+- design_id FK
+- manager_id FK
+- first_name
+- last_name
+- email
+- phone
+- date_of_joining
+- currently: Active / Inactive
+
+LEAVE
+- leave_id PK
+- leave_type_id FK
+- emp_id FK
+- start_date
+- end_date
+- total_days
+- status: Pending / Approved / Rejected
+- reason
+
+LEAVE_TYPE
+- leave_type_id PK
+- company_id FK
+- name
+- description
+
+ATTENDANCE
+- attendance_id PK
+- employee_id FK
+- date
+- check_in
+- check_out
+- status: Present / Absent
+- work_hours
+
+PAYROLL
+- payroll_id PK
+- employee_id FK
+- month
+- year
+- basic_salary
+- allowances
+- deductions
+- total_salary
+- status: Processed / Pending
+
+PAYSLIP
+- payroll_id PK
+- employee_id FK
+- pdf_generation
+
+These structures are derived from the attached ER diagram and must be preserved.
+
+==================================================
+4. PAYROLL REQUIREMENT — IMPORTANT
+==================================================
+
+There is one explicit modification to the payroll requirement:
+
+BONUS must be included under ALLOWANCES.
+
+Do NOT create a separate Bonus entity unless I explicitly request it later.
+
+Payroll should conceptually calculate:
+
+Basic Salary
++ Allowances
++ Bonus
+- Deductions
+= Total Salary
+
+Treat Bonus as a component of the employee's payroll allowances.
+
+The existing Payroll entity already contains:
+- basic_salary
+- allowances
+- deductions
+- total_salary
+- status
+
+Keep the ER structure intact while supporting Bonus as part of the allowance calculation.
+
+==================================================
+5. USER ROLES
+==================================================
+
+There are two main roles:
+
+ADMIN
+EMPLOYEE
+
+ADMIN:
+- Full control over HRMS data
+- Can create, read, update, and delete records where appropriate
+- Can manage employees
+- Can manage departments
+- Can manage designations
+- Can manage leave types
+- Can manage attendance
+- Can manage payroll
+- Can generate payslips
+- Can approve/reject leave
+- Can manage users
+- Can manage company information
+
+EMPLOYEE:
+- Primarily read-only access
+- Can view their own profile
+- Can view their attendance
+- Can view their leave records
+- Can apply for leave where appropriate
+- Can view payroll
+- Can view/download payslips
+- Must not modify administrative information
+- Must not access another employee's private information
+
+Enforce these permissions at the BACKEND level using JWT authentication and role-based authorization.
+
+Do not rely only on frontend hiding buttons for security.
+
+==================================================
+6. BACKEND ARCHITECTURE
+==================================================
+
+Use FastAPI with a clean modular architecture.
+
+Suggested structure:
+
+backend/
+├── app/
+│   ├── main.py
+│   ├── core/
+│   ├── database/
+│   ├── models/
+│   ├── schemas/
+│   ├── routers/
+│   ├── controllers/
+│   ├── services/
+│   ├── middleware/
+│   └── utils/
+├── tests/
+├── requirements.txt
+├── .env
+└── README.md
+
+Use clear separation between:
+
+- API routes
+- Controllers
+- Business logic
+- Database models
+- Pydantic schemas
+- Authentication
+- Authorization
+- Utilities
+
+Do not put all backend logic inside main.py or route files.
+
+==================================================
+7. DATABASE IMPLEMENTATION
+==================================================
+
+Use PostgreSQL.
+
+Use an ORM such as SQLAlchemy unless there is a strong reason to use another appropriate PostgreSQL ORM.
+
+Create database models based strictly on the ER diagram.
+
+Correctly implement:
+- Primary keys
+- Foreign keys
+- Unique constraints
+- Relationships
+- Appropriate data types
+- Referential integrity
+
+Make sure the database relationships match the ER diagram.
+
+Do not invent additional tables simply to make implementation easier.
+
+==================================================
+8. AUTHENTICATION
+==================================================
+
+Implement secure authentication using JWT.
+
+Required functionality should include:
+
+POST /auth/login
+POST /auth/refresh
+POST /auth/logout
+
+Use secure password hashing.
+
+Never store plain-text passwords.
+
+Use environment variables for:
+- Database credentials
+- JWT secret
+- Other sensitive configuration
+
+Protected endpoints must require authentication.
+
+Implement role-based access control.
+
+==================================================
+9. API ENDPOINTS
+==================================================
+
+Consider ALL necessary endpoints required to operate the application properly.
+
+Do not only implement basic CRUD if the business workflow requires additional actions.
+
+Use appropriate HTTP methods and meaningful endpoint names.
+
+-------------------------
+AUTH
+-------------------------
+
+POST   /auth/login
+POST   /auth/refresh
+POST   /auth/logout
+
+-------------------------
+COMPANY
+-------------------------
+
+GET    /companies
+GET    /companies/{company_id}
+POST   /companies
+PUT    /companies/{company_id}
+DELETE /companies/{company_id}
+
+-------------------------
+USERS
+-------------------------
+
+GET    /users
+GET    /users/{user_id}
+POST   /users
+PUT    /users/{user_id}
+DELETE /users/{user_id}
+
+-------------------------
+DEPARTMENTS
+-------------------------
+
+GET    /departments
+GET    /departments/{department_id}
+POST   /departments
+PUT    /departments/{department_id}
+DELETE /departments/{department_id}
+
+-------------------------
+DESIGNATIONS
+-------------------------
+
+GET    /designations
+GET    /designations/{designation_id}
+POST   /designations
+PUT    /designations/{designation_id}
+DELETE /designations/{designation_id}
+
+-------------------------
+EMPLOYEES
+-------------------------
+
+GET    /employees
+GET    /employees/{employee_id}
+POST   /employees
+PUT    /employees/{employee_id}
+DELETE /employees/{employee_id}
+
+Support sensible filtering/searching where useful, such as:
+- department
+- designation
+- manager
+- active/inactive status
+
+-------------------------
+LEAVE TYPES
+-------------------------
+
+GET    /leave-types
+GET    /leave-types/{leave_type_id}
+POST   /leave-types
+PUT    /leave-types/{leave_type_id}
+DELETE /leave-types/{leave_type_id}
+
+-------------------------
+LEAVES
+-------------------------
+
+GET    /leaves
+GET    /leaves/{leave_id}
+POST   /leaves
+PUT    /leaves/{leave_id}
+DELETE /leaves/{leave_id}
+
+Also support leave workflow actions where required:
+
+PATCH  /leaves/{leave_id}/approve
+PATCH  /leaves/{leave_id}/reject
+
+Only authorized users can approve or reject leave.
+
+-------------------------
+ATTENDANCE
+-------------------------
+
+GET    /attendance
+GET    /attendance/{attendance_id}
+POST   /attendance
+PUT    /attendance/{attendance_id}
+DELETE /attendance/{attendance_id}
+
+Support:
+- check-in
+- check-out
+- attendance status
+- work hours
+- attendance history
+
+Employees should normally access only their own attendance data.
+
+Admins can manage attendance according to their permissions.
+
+-------------------------
+PAYROLL
+-------------------------
+
+GET    /payroll
+GET    /payroll/{payroll_id}
+POST   /payroll
+PUT    /payroll/{payroll_id}
+DELETE /payroll/{payroll_id}
+
+Also support payroll processing:
+
+PATCH  /payroll/{payroll_id}/process
+
+Payroll calculations MUST happen on the backend.
+
+Payroll must correctly account for:
+
+basic salary
++ allowances
++ bonus
+- deductions
+= total salary
+
+Do not trust salary calculations supplied directly by the React Native client.
+
+-------------------------
+PAYSLIPS
+-------------------------
+
+GET    /payslips
+GET    /payslips/{payroll_id}
+POST   /payslips/{payroll_id}/generate
+
+Generate a PDF payslip from the corresponding payroll information.
+
+Employees can access only their own payslips.
+
+Admins can generate payslips.
+
+==================================================
+10. API DESIGN AND VALIDATION
+==================================================
+
+Use Pydantic schemas for request and response validation.
+
+Implement:
+- request validation
+- response schemas
+- meaningful HTTP status codes
+- proper error handling
+- consistent API responses
+- pagination where appropriate
+- filtering/search where appropriate
+
+Use FastAPI's Swagger/OpenAPI documentation.
+
+The API should be easy to test and understand.
+
+==================================================
+11. REACT NATIVE APPLICATION
+==================================================
+
+Build the frontend using React Native.
+
+Suggested structure:
+
+frontend/
+├── screens/
+├── components/
+├── navigation/
+├── services/
+├── hooks/
+├── utils/
+├── constants/
+├── assets/
+└── ...
+
+Keep API calls inside a dedicated service layer.
+
+Do not mix large amounts of API/business logic directly inside UI components.
+
+==================================================
+12. UI / UX REQUIREMENTS
+==================================================
+
+The UI is extremely important.
+
+Design the app to be:
+
+- Simple
+- Clean
+- Professional
+- Modern
+- Easy to understand
+- Easy to navigate
+- Suitable for non-technical HR users
+- Not cluttered
+
+Do NOT:
+- overload screens with cards
+- use excessive colors
+- use unnecessary animations
+- create complicated dashboards
+- add unnecessary features
+- create unnecessarily deep navigation
+
+Prefer:
+- clear typography
+- simple navigation
+- consistent spacing
+- clear buttons
+- understandable labels
+- useful empty states
+- useful loading states
+- clear error messages
+- confirmation dialogs for destructive actions
+
+The application should feel like a professional business application rather than a flashy demo.
+
+==================================================
+13. ADMIN UI
+==================================================
+
+Admin should have access to management screens such as:
+
+- Dashboard
+- Employees
+- Departments
+- Designations
+- Leave Types
+- Leave Management
+- Attendance
+- Payroll
+- Payslips
+- Users
+- Company information
+- Profile / Settings
+
+Admin should see appropriate Create / Edit / Delete / Approve / Process actions.
+
+==================================================
+14. EMPLOYEE UI
+==================================================
+
+Employees should have a simpler experience.
+
+They should be able to access:
+
+- Dashboard
+- My Profile
+- My Attendance
+- My Leaves
+- Leave Application
+- My Payroll
+- My Payslips
+- Settings
+
+Employees should NOT see administrative management controls.
+
+==================================================
+15. PROJECT DEVELOPMENT ORDER
+==================================================
+
+Do not attempt to generate the entire application blindly in a single step.
+
+Build it incrementally in this order:
+
+PHASE 1
+- Project setup
+- PostgreSQL setup
+- Database configuration
+
+PHASE 2
+- Database models
+- Relationships
+- Migrations
+
+PHASE 3
+- FastAPI setup
+- Routers
+- Schemas
+- Services
+- Error handling
+
+PHASE 4
+- Authentication
+- JWT
+- Password hashing
+- Role-based access control
+
+PHASE 5
+- Company
+- Users
+- Departments
+- Designations
+
+PHASE 6
+- Employees
+
+PHASE 7
+- Leave Types
+- Leave Management
+
+PHASE 8
+- Attendance
+
+PHASE 9
+- Payroll
+- Bonus as part of allowances
+- Payroll processing
+
+PHASE 10
+- Payslip generation
+
+PHASE 11
+- React Native UI
+- Navigation
+- Authentication screens
+- Admin screens
+- Employee screens
+
+PHASE 12
+- Connect React Native to FastAPI
+
+PHASE 13
+- Testing
+- Validation
+- Error handling
+- UI refinement
+
+PHASE 14
+- Deployment preparation
+- Environment configuration
+- Documentation
+
+==================================================
+16. TESTING
+==================================================
+
+Create appropriate tests for important backend functionality.
+
+Test:
+- authentication
+- authorization
+- CRUD operations
+- leave approval/rejection
+- attendance
+- payroll calculations
+- bonus calculation
+- payslip generation
+- employee access restrictions
+- admin permissions
+
+Make sure an Employee cannot access or modify Admin-only resources.
+
+==================================================
+17. IMPORTANT IMPLEMENTATION RULES
+==================================================
+
+RULE 1:
+The ER diagram is the source of truth for database structure.
+
+RULE 2:
+Do not add unnecessary entities or modules.
+
+RULE 3:
+Do not change existing relationships without explicitly stating why and asking for confirmation.
+
+RULE 4:
+FastAPI is the backend framework.
+
+RULE 5:
+PostgreSQL is the database.
+
+RULE 6:
+React Native is the frontend.
+
+RULE 7:
+JWT must be used for authentication.
+
+RULE 8:
+Authorization must be enforced on the backend.
+
+RULE 9:
+Payroll calculations must happen on the backend.
+
+RULE 10:
+Bonus must be handled under payroll allowances.
+
+RULE 11:
+Keep the UI simple and uncluttered.
+
+RULE 12:
+Keep frontend, backend, and database structures consistent with each other.
+
+RULE 13:
+Do not generate unnecessary technologies just because they are popular.
+
+RULE 14:
+Do not replace the selected stack with another stack.
+
+RULE 15:
+Before implementing a feature, verify that it is consistent with the ER diagram and existing project structure.
+
+==================================================
+18. HOW YOU SHOULD WORK
+==================================================
+
+Before writing implementation code:
+
+1. Analyze the ER diagram.
+2. Analyze the technology requirements.
+3. Define the project structure.
+4. Identify all required modules and API endpoints.
+5. Identify dependencies between modules.
+6. Then begin implementation phase by phase.
+
+When generating code:
+- explain where each file belongs
+- provide complete code for each file you create or modify
+- do not leave important parts as unexplained placeholders
+- maintain consistency with previously generated files
+- do not silently change database schemas
+- do not silently change API contracts
+- do not duplicate code unnecessarily
+
+Whenever there is ambiguity, prefer the existing ER diagram and stated project requirements over assumptions.
+
+==================================================
+19. FINAL PRODUCT
+==================================================
+
+The final system should be a complete HRMS mobile application built with:
+
+React Native
++
+FastAPI
++
+PostgreSQL
++
+JWT Authentication
+
+It should support:
+
+- Company management
+- User management
+- Employee management
+- Department management
+- Designation management
+- Leave types
+- Leave management
+- Attendance
+- Payroll
+- Bonus under allowances
+- Deductions
+- Payslip generation
+- Admin/Employee access control
+
+The final product should be:
+
+- functional
+- maintainable
+- secure
+- scalable enough for small/medium businesses
+- easy to use
+- visually clean
+- consistent with the ER diagram
+
+MOST IMPORTANT:
+Do not treat this as a generic HRMS project. Build THIS project according to the attached ER diagram and requirements above.
