@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { AppBar, Card, Screen, StatusPill } from '../../components/ui';
-import { useCancelLeave, useMyLeaves } from '../../services/useHrms';
+import { useBalancesMine, useCancelLeave, useMyLeaves } from '../../services/useHrms';
 import {colors, radius, fonts} from '../../theme';
 
 /** PAGE 8/11 — My Leaves. Pending requests can be cancelled (DELETE /leaves/{id}). */
@@ -20,6 +20,7 @@ const TABS = ['All', 'Pending', 'Approved', 'Rejected'] as const;
 
 export default function EmpLeaves() {
   const { data, isLoading, error, refetch } = useMyLeaves();
+  const balances = useBalancesMine();
   const cancel = useCancelLeave();
   const [tab, setTab] = useState<(typeof TABS)[number]>('All');
   const rows = useMemo(() => (tab === 'All' ? data : data.filter((l) => l.status === tab)), [data, tab]);
@@ -71,6 +72,19 @@ export default function EmpLeaves() {
           })}
         </View>
 
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.bals}>
+            {balances.data.map((b) => (
+              <Card key={b.leave_type} style={styles.bal}>
+                <Text style={styles.balN}>
+                  {b.remaining}<Text style={styles.balT}>/{b.entitled}</Text>
+                </Text>
+                <Text style={styles.balL}>{b.leave_type}</Text>
+              </Card>
+            ))}
+          </View>
+        </ScrollView>
+
         {isLoading && <ActivityIndicator color={colors.navy} style={{ marginVertical: 16 }} />}
         {error && (
           <Card>
@@ -120,6 +134,11 @@ const styles = StyleSheet.create({
   apply: { backgroundColor: colors.navy, borderRadius: radius.sm, paddingHorizontal: 16, paddingVertical: 12 },
   applyText: { color: '#FFF', fontFamily: fonts.display, fontSize: 13 },
   tabs: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  bals: { flexDirection: 'row', gap: 10, paddingRight: 16 },
+  bal: { minWidth: 104, alignItems: 'center' },
+  balN: { fontSize: 20, fontFamily: fonts.displayExtra, color: colors.navy },
+  balT: { fontSize: 12, fontFamily: fonts.body, color: colors.muted },
+  balL: { fontSize: 11, fontFamily: fonts.body, color: colors.muted, marginTop: 2, textTransform: 'capitalize' },
   tab: { backgroundColor: colors.royalSoft, borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 9 },
   tabActive: { backgroundColor: colors.navy },
   tabText: { fontSize: 12, fontFamily: fonts.display, color: colors.muted },

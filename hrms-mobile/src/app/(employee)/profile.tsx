@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { AppBar, Card, Screen, StatusPill } from '../../components/ui';
+import { lockEnabled, setLockEnabled, supported, unlock } from '../../services/applock';
 import { useAuth } from '../../store/AuthContext';
 import { useMyProfile } from '../../services/useHrms';
 import {colors, radius, fonts} from '../../theme';
@@ -10,6 +12,24 @@ import {colors, radius, fonts} from '../../theme';
 export default function EmpProfile() {
   const { signOut, user } = useAuth();
   const { data: e, isLoading, error, refetch } = useMyProfile();
+  const [lock, setLock] = useState(false);
+  const [canLock, setCanLock] = useState(false);
+
+  useEffect(() => {
+    supported().then(setCanLock);
+    lockEnabled().then(setLock);
+  }, []);
+
+  const toggleLock = async (v: boolean) => {
+    if (v) {
+      if (!(await unlock('Enable app lock'))) return;
+      await setLockEnabled(true);
+      setLock(true);
+    } else {
+      await setLockEnabled(false);
+      setLock(false);
+    }
+  };
 
   if (isLoading)
     return (
@@ -108,6 +128,15 @@ export default function EmpProfile() {
           }}>
           <Text style={styles.signoutText}>⇥   Sign Out of Account</Text>
         </Pressable>
+        {canLock && (
+          <Card style={styles.lockRow}>
+            <View style={styles.lockMid}>
+              <Text style={styles.lockTitle}>Biometric app lock</Text>
+              <Text style={styles.lockSub}>Require unlock when returning to the app</Text>
+            </View>
+            <Switch value={lock} onValueChange={toggleLock} />
+          </Card>
+        )}
         <Text style={styles.ver}>Workforce OS • v2.4.1 (Build 402){user ? ` • ${user.username}` : ''}</Text>
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -133,5 +162,9 @@ const styles = StyleSheet.create({
   fVal: { fontSize: 14, fontFamily: fonts.display, color: colors.text, marginTop: 1 },
   signout: { backgroundColor: colors.dangerBg, borderRadius: radius.lg, minHeight: 52, alignItems: 'center', justifyContent: 'center' },
   signoutText: { color: colors.danger, fontFamily: fonts.displayExtra, fontSize: 14 },
+  lockRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  lockMid: { flex: 1 },
+  lockTitle: { fontSize: 14, fontFamily: fonts.display, color: colors.text },
+  lockSub: { fontSize: 12, fontFamily: fonts.body, color: colors.muted, marginTop: 2 },
   ver: { textAlign: 'center', color: colors.placeholder, fontSize: 12, marginTop: 4, fontFamily: fonts.body, },
 });

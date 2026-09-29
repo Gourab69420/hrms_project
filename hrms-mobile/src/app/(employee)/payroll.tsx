@@ -27,18 +27,28 @@ export default function EmpPayroll() {
     setPdfBusy(true);
     try {
       const r = c.raw;
+      const line = (l: string, v: number | string) => `<p>${l}: ${v}</p>`;
       const html = `
         <html><body style="font-family:sans-serif;padding:32px;color:#0F172A">
           <h1>Payslip — ${c.month}</h1>
           <p>Payroll ID: ${c.payrollId} • Status: ${c.status}</p>
           <hr/>
-          <p>Basic Salary: ${c.basic}</p>
-          <p>Allowances / Bonuses: ${c.allowances}</p>
-          <p>Gross: ${c.gross}</p>
-          <p>Deductions: ${c.deductions}</p>
+          <h3>Earnings</h3>
+          ${line('Basic Salary', c.basic)}
+          ${r.hra ? line('HRA', 'Rs.' + Math.round(r.hra).toLocaleString('en-IN')) : ''}
+          ${r.conveyance ? line('Conveyance', 'Rs.' + Math.round(r.conveyance).toLocaleString('en-IN')) : ''}
+          ${r.special_allowance ? line('Special Allowance', 'Rs.' + Math.round(r.special_allowance).toLocaleString('en-IN')) : ''}
+          ${line('Bonuses', c.allowances)}
+          ${line('Gross', c.gross)}
+          <h3>Deductions</h3>
+          ${r.pf_amount ? line('PF (employee)', 'Rs.' + Math.round(r.pf_amount).toLocaleString('en-IN')) : ''}
+          ${r.esi_amount ? line('ESI (employee)', 'Rs.' + Math.round(r.esi_amount).toLocaleString('en-IN')) : ''}
+          ${r.pt_amount ? line('Professional Tax (WB)', 'Rs.' + Math.round(r.pt_amount).toLocaleString('en-IN')) : ''}
+          ${r.tds_amount ? line('TDS (estimated)', 'Rs.' + Math.round(r.tds_amount).toLocaleString('en-IN')) : ''}
+          ${r.loan_deduction ? line('Loan EMI', 'Rs.' + Math.round(r.loan_deduction).toLocaleString('en-IN')) : ''}
+          ${line('Other Deductions', c.deductions)}
           <hr/>
           <h2>Net Pay: ${c.net}</h2>
-          <p>Basic ${r.basic_salary} + Bonuses ${r.bonuses} − Deductions ${r.deductions} = Net ${r.net_salary}</p>
         </body></html>`;
       const { uri } = await Print.printToFileAsync({ html });
       if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(uri);
@@ -100,7 +110,10 @@ export default function EmpPayroll() {
               <Row l="Basic Salary" r={c.basic} />
               <Row l="Allowances" r={c.allowances} />
               <Row l="Gross" r={c.gross} />
-              <Row l="Deductions" r={`-${c.deductions}`} />
+              {(c.breakdown ?? []).map((b) => (
+                <Row key={b.l} l={b.l} r={b.r} />
+              ))}
+              <Row l="Other Deductions" r={`-${c.deductions}`} />
               <View style={styles.formula}>
                 <Text style={styles.formulaText}>
                   {c.basic} + {c.allowances} − {c.deductions} = {c.net}

@@ -1,4 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
   ActivityIndicator,
@@ -11,7 +14,8 @@ import {
   View,
 } from 'react-native';
 import { AppBar, Avatar, Card, Screen, StatusPill } from '../../../components/ui';
-import { api } from '../../../services/api';
+import { api, downloadDocUrl, getMyDocs, type Doc } from '../../../services/api';
+import { useAuth } from '../../../store/AuthContext';
 import { useEmployee } from '../../../services/useHrms';
 import {colors, radius, fonts} from '../../../theme';
 import { useEffect, useState } from 'react';
@@ -19,6 +23,7 @@ import { useEffect, useState } from 'react';
 /** Staff detail — live employee + counts. Call / Email buttons use device linking. */
 export default function StaffDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { backendRole } = useAuth();
   const empId = Number(id);
   const { data: e, isLoading, error } = useEmployee(empId);
   const [counts, setCounts] = useState<{ att: number; leaves: number } | null>(null);
@@ -103,6 +108,9 @@ export default function StaffDetail() {
           </Pressable>
         </View>
 
+        <DocumentsSection empId={e.id} />
+
+        {backendRole === 'admin' && (
         <Pressable
           style={styles.danger}
           onPress={() =>
@@ -124,6 +132,7 @@ export default function StaffDetail() {
           }>
           <Text style={styles.dangerText}>Deactivate employee</Text>
         </Pressable>
+        )}
       </ScrollView>
     </Screen>
   );
@@ -136,6 +145,91 @@ function Row({ label, value }: { label: string; value: string }) {
       <Text style={styles.val}>{value}</Text>
     </View>
   );
+}
+
+function DocumentsSection({ empId }: { empId: number }) {
+  const [docs, setDocs] = useState<Doc[]>([]);
+  const [docType, setDocType] = useState('offer_letter');
+  const [busy, setBusy] = useState(false);
+
+  const load = async () => {
+    try {
+      setDocs(await getMyDocs(empId));
+    } catch {
+      /* non-fatal */
+    }
+  };
+  useEffect(() => {
+    load();
+  }, [empId]);
+
+  const upload = async () => {
+    const picked = await DocumentPicker.getDocumentAsync({
+      type: ['application/pdf', 'image/*'],
+      copyToCacheDirectory: true,
+    });
+    if (picked.canceled) return;
+    const asset = picked.assets[0];
+    setBusy(true);
+    try {
+      const form = new FormData();
+      form.append('file', {
+        uri: asset.uri,
+        name: asset.name ?? 'document.pdf',
+        type: asset.mimeType ?? 'application/pdf',
+      } as never);
+      await api.post(`/documents/employee/${empId}?doc_type=${encodeURIComponent(docType)}`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      await load();
+    } catch (e) {
+      Alert.alert('Upload failed', e instanceof Error ? e.message : 'Try again');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const open = async (d: Doc) => {
+    try {
+      const target = `${FileSystem.cacheDirectory ?? FileSystem.documentDirectory}${d.file_name}`;
+      const dl = await FileSystem.downloadAsync(downloadDocUrl(d.id), target, {
+        headers: { Authorization: `Bearer ${await currentToken()}` },
+      });
+      if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(dl.uri);
+      else Alert.alert('Saved', dl.uri);
+    } catch (e) {
+      Alert.alert('Download failed', e instanceof Error ? e.message : 'Try again');
+    }
+  };
+
+  return (
+    <Card>
+      <Text style={styles.docTitle}>Documents</Text>
+      {docs.map((d) => (
+        <Pressable key={d.id} style={styles.docRow} onPress={() => open(d)}>
+          <Text style={styles.docName}>
+            📄 {d.file_name} <Text style={styles.docMeta}>({d.doc_type})</Text>
+          </Text>
+        </Pressable>
+      ))}
+      {docs.length === 0 && <Text style={styles.docMeta}>No documents yet.</Text>}
+      <View style={styles.docTypes}>
+        {['offer_letter', 'id_proof', 'contract', 'other'].map((t) => (
+          <Pressable key={t} onPress={() => setDocType(t)} style={[styles.chip, docType === t && styles.chipOn]}>
+            <Text style={[styles.chipText, docType === t && styles.chipTextOn]}>{t}</Text>
+          </Pressable>
+        ))}
+      </View>
+      <Pressable style={styles.upload} onPress={upload} disabled={busy}>
+        <Text style={styles.uploadText}>{busy ? 'Uploading…' : '⤒ Upload document'}</Text>
+      </Pressable>
+    </Card>
+  );
+}
+
+async function currentToken(): Promise<string> {
+  const { loadToken } = await import('../../../services/api');
+  return (await loadToken()) ?? '';
 }
 
 const styles = StyleSheet.create({
@@ -157,4 +251,15 @@ const styles = StyleSheet.create({
   btnText: { color: '#FFF', fontFamily: fonts.displayExtra },
   danger: { alignItems: 'center', padding: 12 },
   dangerText: { color: colors.dangerDot, fontFamily: fonts.display },
+  docTitle: { fontSize: 15, fontFamily: fonts.display, color: colors.text, marginBottom: 8 },
+  docRow: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border },
+  docName: { fontSize: 13, fontFamily: fonts.body, color: colors.text },
+  docMeta: { fontSize: 12, fontFamily: fonts.body, color: colors.muted },
+  docTypes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
+  chip: { borderWidth: 1, borderColor: colors.border, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7, backgroundColor: '#FFF' },
+  chipOn: { backgroundColor: colors.navy, borderColor: colors.navy },
+  chipText: { fontFamily: fonts.body, fontSize: 12, color: colors.muted },
+  chipTextOn: { color: '#FFF' },
+  upload: { backgroundColor: colors.royalSoft, borderRadius: radius.md, minHeight: 44, alignItems: 'center', justifyContent: 'center', marginTop: 10 },
+  uploadText: { color: colors.navy, fontFamily: fonts.display, fontSize: 13 },
 });

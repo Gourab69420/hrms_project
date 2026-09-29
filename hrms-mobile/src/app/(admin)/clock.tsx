@@ -5,7 +5,7 @@ import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AppBar, Avatar, Card, Screen, SearchBar, StatusPill } from '../../components/ui';
-import { listAllAttendance, listEmployees } from '../../services/api';
+import { api, listAllAttendance, listEmployees } from '../../services/api';
 import { qError, useDepartments } from '../../services/useHrms';
 import {colors, radius, fonts} from '../../theme';
 
@@ -16,6 +16,7 @@ import {colors, radius, fonts} from '../../theme';
 export default function Clock() {
   const [q, setQ] = useState('');
   const [exporting, setExporting] = useState(false);
+  const [alerting, setAlerting] = useState(false);
   const { data: depts } = useDepartments();
   const empQ = useQuery({ queryKey: ['employees'], queryFn: () => listEmployees() });
   const attQ = useQuery({ queryKey: ['attendance-all'], queryFn: listAllAttendance });
@@ -153,6 +154,32 @@ export default function Clock() {
           </View>
           <Pressable style={styles.exportBtn} onPress={exportCsv} disabled={exporting}>
             <Text style={styles.exportBtnText}>{exporting ? '…' : 'Export ⤓'}</Text>
+          </Pressable>
+        </Card>
+
+        <Card style={styles.export}>
+          <View>
+            <Text style={styles.exportTitle}>Absentee Alerts</Text>
+            <Text style={styles.exportSub}>Notify managers of staff with no punch-in (after 10:30)</Text>
+          </View>
+          <Pressable
+            style={styles.exportBtn}
+            disabled={alerting}
+            onPress={async () => {
+              setAlerting(true);
+              try {
+                const r = await api.post('/alerts/absentee');
+                Alert.alert(
+                  'Alerts sent',
+                  r.data.skipped ? 'Skipped (holiday).' : `${r.data.notified} manager(s) notified, ${r.data.missing} missing.`,
+                );
+              } catch (e) {
+                Alert.alert('Failed', e instanceof Error ? e.message : 'Try again');
+              } finally {
+                setAlerting(false);
+              }
+            }}>
+            <Text style={styles.exportBtnText}>{alerting ? '…' : 'Send 🔔'}</Text>
           </Pressable>
         </Card>
         <View style={{ height: 24 }} />

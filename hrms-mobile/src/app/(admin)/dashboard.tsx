@@ -20,7 +20,7 @@ import {colors, radius, shadow, fonts} from '../../theme';
  * All buttons work: quick actions navigate, approve/reject hits PATCH /leaves/{id}/status.
  */
 export default function AdminDashboard() {
-  const { signOut } = useAuth();
+  const { signOut, backendRole } = useAuth();
   const stats = useDashboardStats();
   const leaves = useDashboardLeaves();
   const action = useLeaveAction();
@@ -155,6 +155,30 @@ export default function AdminDashboard() {
           ))}
         </View>
 
+        <SectionHeader title="Manage" />
+        <View style={styles.grid}>
+          {(
+            [
+              { icon: 'checkmark-done-outline', label: 'Approvals', to: '/(admin)/approvals' },
+              { icon: 'time-outline', label: 'Regulns', to: '/(admin)/regs' },
+              { icon: 'ticket-outline', label: 'Tickets', to: '/(admin)/tickets' },
+              { icon: 'exit-outline', label: 'Exits', to: '/(admin)/exits' },
+              { icon: 'calendar-outline', label: 'Holidays', to: '/(admin)/holidays' },
+              { icon: 'megaphone-outline', label: 'Announce', to: '/(admin)/announcements' },
+              { icon: 'cash-outline', label: 'Loans', to: '/(admin)/comp' },
+              { icon: 'swap-horizontal-outline', label: 'Shifts', to: '/(admin)/shifts' },
+              ...(backendRole === 'admin'
+                ? [{ icon: 'list-outline', label: 'Audit', to: '/(admin)/audit' } as const]
+                : []),
+            ] as const
+          ).map((a) => (
+            <Pressable key={a.label} style={styles.manage} onPress={() => router.push(a.to as never)}>
+              <Ionicons name={a.icon as never} size={20} color={colors.navy} />
+              <Text style={styles.manageLabel}>{a.label}</Text>
+            </Pressable>
+          ))}
+        </View>
+
         <SectionHeader
           title={`Leave Requests  ${pending.length}`}
           action={
@@ -231,6 +255,11 @@ const styles = StyleSheet.create({
   greeting: { fontSize: 26, fontFamily: fonts.displayExtra, color: colors.text, letterSpacing: -0.4 },
   date: { fontSize: 14, color: colors.muted, marginTop: 2, fontFamily: fonts.body, },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 14 },
+  manage: {
+    width: '31%', flexGrow: 1, backgroundColor: '#FFF', borderColor: colors.border, borderWidth: 1,
+    borderRadius: 12, paddingVertical: 12, alignItems: 'center', gap: 6,
+  },
+  manageLabel: { fontSize: 11, fontFamily: fonts.display, color: colors.text },
   kpi: { width: '48%', flexGrow: 1, gap: 4 },
   kpiLabel: { fontSize: 13, color: colors.muted, fontFamily: fonts.medium },
   kpiValue: { fontSize: 30, fontFamily: fonts.displayExtra, color: colors.text },

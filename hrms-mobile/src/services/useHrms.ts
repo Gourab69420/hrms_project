@@ -302,6 +302,21 @@ export function usePayroll() {
   const fmt = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
   const monthName = (m: number, y: number) =>
     new Date(y, m - 1, 1).toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  const statRows = (p: typeof last) =>
+    p
+      ? [
+          { l: 'Basic Salary', r: fmt(p.basic_salary) },
+          ...(p.hra ? [{ l: 'HRA', r: fmt(p.hra) }] : []),
+          ...(p.conveyance ? [{ l: 'Conveyance', r: fmt(p.conveyance) }] : []),
+          ...(p.special_allowance ? [{ l: 'Special Allowance', r: fmt(p.special_allowance) }] : []),
+          ...(p.bonuses ? [{ l: 'Bonuses', r: fmt(p.bonuses) }] : []),
+          ...(p.pf_amount ? [{ l: 'PF (employee)', r: `-${fmt(p.pf_amount)}` }] : []),
+          ...(p.esi_amount ? [{ l: 'ESI (employee)', r: `-${fmt(p.esi_amount)}` }] : []),
+          ...(p.pt_amount ? [{ l: 'Prof. Tax (WB)', r: `-${fmt(p.pt_amount)}` }] : []),
+          ...(p.tds_amount ? [{ l: 'TDS (est.)', r: `-${fmt(p.tds_amount)}` }] : []),
+          ...(p.loan_deduction ? [{ l: 'Loan EMI', r: `-${fmt(p.loan_deduction)}` }] : []),
+        ]
+      : [];
   return {
     data: last
       ? {
@@ -316,6 +331,7 @@ export function usePayroll() {
             allowances: fmt(last.bonuses),
             gross: fmt(last.basic_salary + last.bonuses),
             deductions: fmt(last.deductions),
+            breakdown: statRows(last),
             raw: last,
           },
           history: rows.slice(0, -1).reverse().map((p) => ({
@@ -357,6 +373,14 @@ export function usePunch() {
       qc.invalidateQueries({ queryKey: ['attendance-mine', user?.employee_id] });
       qc.invalidateQueries({ queryKey: ['attendance-all'] });
       qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
+    },
+    onError: async (e: unknown) => {
+      // No network: keep the tap — it flushes on reconnect (basement-parking proof).
+      const axiosErr = e as { response?: unknown; message?: string };
+      if (!axiosErr.response) {
+        const { queuePunch } = await import('./offlineQueue');
+        await queuePunch();
+      }
     },
   });
 }
@@ -431,4 +455,92 @@ export function useCreatePayroll() {
       qc.invalidateQueries({ queryKey: ['payroll-mine'] });
     },
   });
+}
+
+/* ---------- Phase-2 modules ---------- */
+
+export function useBalancesMine() {
+  const { user } = useAuth();
+  const q = useQuery({
+    queryKey: ['balances-mine'],
+    queryFn: () => import('./api').then((m) => m.getBalancesMine()),
+    enabled: !!user?.employee_id,
+  });
+  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
+}
+
+export function useHolidays() {
+  const q = useQuery({ queryKey: ['holidays'], queryFn: () => import('./api').then((m) => m.getHolidays()) });
+  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
+}
+
+export function useAnnouncements() {
+  const q = useQuery({
+    queryKey: ['announcements'],
+    queryFn: () => import('./api').then((m) => m.getAnnouncements()),
+  });
+  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
+}
+
+export function usePolls() {
+  const qc = useQueryClient();
+  const q = useQuery({ queryKey: ['polls'], queryFn: () => import('./api').then((m) => m.getPolls()) });
+  const vote = useMutation({
+    mutationFn: ({ pollId, optionId }: { pollId: number; optionId: number }) =>
+      import('./api').then((m) => m.votePoll(pollId, optionId)),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['polls'] }),
+  });
+  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch, vote };
+}
+
+export function useMyRegs() {
+  const q = useQuery({ queryKey: ['regs-my'], queryFn: () => import('./api').then((m) => m.getMyRegs()) });
+  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
+}
+
+export function useMyLoans() {
+  const q = useQuery({ queryKey: ['loans-my'], queryFn: () => import('./api').then((m) => m.getMyLoans()) });
+  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
+}
+
+export function useMyTickets() {
+  const qc = useQueryClient();
+  const q = useQuery({ queryKey: ['tickets-my'], queryFn: () => import('./api').then((m) => m.getMyTickets()) });
+  const open = useMutation({
+    mutationFn: (p: { category: string; subject: string; body?: string }) =>
+      import('./api').then((m) => m.openTicket(p)),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['tickets-my'] }),
+  });
+  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch, open };
+}
+
+export function useMyExit() {
+  const qc = useQueryClient();
+  const q = useQuery({ queryKey: ['exit-my'], queryFn: () => import('./api').then((m) => m.getMyExit()) });
+  const submit = useMutation({
+    mutationFn: (p: { resignation_date: string; last_working_date: string; notes?: string }) =>
+      import('./api').then((m) => m.resign(p)),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['exit-my'] }),
+  });
+  return { data: q.data ?? null, isLoading: q.isLoading, error: null, refetch: q.refetch, submit };
+}
+
+export function useMyDocs() {
+  const { user } = useAuth();
+  const q = useQuery({
+    queryKey: ['docs-my', user?.employee_id],
+    queryFn: () => import('./api').then((m) => m.getMyDocs(user!.employee_id!)),
+    enabled: !!user?.employee_id,
+  });
+  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
+}
+
+export function useInbox() {
+  const q = useQuery({ queryKey: ['inbox'], queryFn: () => import('./api').then((m) => m.getInbox()) });
+  return {
+    data: q.data ?? { leaves: 0, regularizations: 0, tickets: 0, exits: 0 },
+    isLoading: q.isLoading,
+    error: q.error ? qError(q.error) : null,
+    refetch: q.refetch,
+  };
 }

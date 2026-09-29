@@ -15,7 +15,14 @@ export default function EmpHome() {
   const doPunch = () => {
     punch.mutate(undefined, {
       onSuccess: () => att.refetch(),
-      onError: (e) => Alert.alert('Punch failed', e instanceof Error ? e.message : 'Try again'),
+      onError: (e) => {
+        const msg = e instanceof Error ? e.message : 'Try again';
+        Alert.alert(
+          /network/i.test(msg) ? 'Saved offline' : 'Punch failed',
+          /network/i.test(msg) ? 'No connection — your punch will sync automatically.' : msg,
+        );
+        att.refetch();
+      },
     });
   };
 
@@ -98,6 +105,26 @@ export default function EmpHome() {
             </Pressable>
           ))}
         </View>
+        <Text style={styles.section}>Services</Text>
+        <View style={styles.grid}>
+          {(
+            [
+              { icon: 'megaphone-outline', label: 'Notices', to: '/(employee)/announcements' },
+              { icon: 'calendar-outline', label: 'Holidays', to: '/(employee)/holidays' },
+              { icon: 'time-outline', label: 'Missed punch', to: '/(employee)/regularization' },
+              { icon: 'cash-outline', label: 'Loans', to: '/(employee)/loans' },
+              { icon: 'ticket-outline', label: 'Helpdesk', to: '/(employee)/tickets' },
+              { icon: 'exit-outline', label: 'Exit', to: '/(employee)/exit' },
+              { icon: 'folder-outline', label: 'Documents', to: '/(employee)/documents' },
+              { icon: 'people-outline', label: 'Team', to: '/(employee)/team' },
+            ] as const
+          ).map((a) => (
+            <Pressable key={a.label} style={styles.svc} onPress={() => router.push(a.to as never)}>
+              <Ionicons name={a.icon as never} size={20} color={colors.navy} />
+              <Text style={styles.svcLabel}>{a.label}</Text>
+            </Pressable>
+          ))}
+        </View>
         <View style={{ height: 24 }} />
       </ScrollView>
     </Screen>
@@ -127,4 +154,10 @@ const styles = StyleSheet.create({
   },
   actionIcon: { width: 36, height: 36, borderRadius: 10, backgroundColor: colors.royalSoft, alignItems: 'center', justifyContent: 'center' },
   actionLabel: { flex: 1, fontSize: 14, fontFamily: fonts.display, color: colors.royal },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  svc: {
+    width: '31%', flexGrow: 1, backgroundColor: '#FFF', borderColor: colors.border, borderWidth: 1,
+    borderRadius: 12, paddingVertical: 12, alignItems: 'center', gap: 6,
+  },
+  svcLabel: { fontSize: 11, fontFamily: fonts.display, color: colors.text },
 });

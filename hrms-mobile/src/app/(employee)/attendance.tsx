@@ -25,7 +25,14 @@ export default function EmpAttendance() {
   const doPunch = () => {
     punch.mutate(undefined, {
       onSuccess: () => refetch(),
-      onError: (e) => Alert.alert('Punch failed', e instanceof Error ? e.message : 'Try again'),
+      onError: (e) => {
+        const msg = e instanceof Error ? e.message : 'Try again';
+        Alert.alert(
+          /network/i.test(msg) ? 'Saved offline' : 'Punch failed',
+          /network/i.test(msg) ? 'No connection — your punch will sync automatically.' : msg,
+        );
+        refetch();
+      },
     });
   };
 

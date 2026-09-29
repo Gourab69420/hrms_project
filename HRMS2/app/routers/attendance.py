@@ -42,10 +42,9 @@ def punch(
     now = datetime.now()
     if rec and rec.check_out is None:
         rec.check_out = now
-        if rec.status == models.AttendanceStatusEnum.present and rec.check_in:
-            late = (rec.check_in.hour, rec.check_in.minute) >= (9, 30)
-            if late:
-                rec.status = models.AttendanceStatusEnum.late
+        if rec.check_in:
+            rec.work_hours = round((now - rec.check_in).total_seconds() / 3600, 2)
+            late_mark(rec, rec.check_in, db)
         db.commit()
         db.refresh(rec)
         return rec
@@ -57,10 +56,26 @@ def punch(
         check_in=now,
         status=models.AttendanceStatusEnum.present,
     )
+    late_mark(obj, now, db)
     db.add(obj)
     db.commit()
     db.refresh(obj)
     return obj
+
+
+def late_mark(rec: models.Attendance, check_in: datetime, db: Session) -> None:
+    """Late if past the employee's shift grace time (default 09:30)."""
+    emp = db.query(models.Employee).filter(models.Employee.id == rec.employee_id).first()
+    grace = None
+    if emp and emp.shift_id:
+        shift = db.query(models.Shift).filter(models.Shift.id == emp.shift_id).first()
+        if shift:
+            grace = shift.late_after
+    if grace is None:
+        from datetime import time as dtime
+        grace = dtime(9, 30)
+    if (check_in.hour, check_in.minute) >= (grace.hour, grace.minute):
+        rec.status = models.AttendanceStatusEnum.late
 
 
 @router.get("/employee/{emp_id}", response_model=List[schemas.AttendanceOut])

@@ -1,5 +1,7 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import { getLeaveTypes } from '../../services/api';
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -23,6 +25,7 @@ const pretty = (d: Date) =>
 /** PAGE 9/11 — Apply Leave. Real date pickers + POST /leaves/. */
 export default function ApplyLeave() {
   const apply = useApplyLeave();
+  const typesQ = useQuery({ queryKey: ['leave-types'], queryFn: getLeaveTypes });
   const [leaveType, setLeaveType] = useState('casual');
   const [open, setOpen] = useState(false);
   const [start, setStart] = useState(new Date());
@@ -31,7 +34,8 @@ export default function ApplyLeave() {
   const [showEnd, setShowEnd] = useState(false);
   const [reason, setReason] = useState('');
   const [err, setErr] = useState<string | null>(null);
-  const types = ['sick', 'casual', 'annual'];
+  const types = (typesQ.data ?? []).map((t) => t.name);
+  const typeNames = types.length ? types : ['casual', 'sick', 'earned', 'unpaid'];
 
   const days = useMemo(() => {
     const ms = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
@@ -70,7 +74,7 @@ export default function ApplyLeave() {
             <Text style={styles.chev}>⌄</Text>
           </Pressable>
           {open &&
-            types.map((t) => (
+            typeNames.map((t) => (
               <Pressable
                 key={t}
                 style={styles.opt}

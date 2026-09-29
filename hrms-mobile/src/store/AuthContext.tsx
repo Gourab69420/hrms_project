@@ -1,11 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { clearToken, loadToken, login as apiLogin, me, toApiError, type BackendUser } from '../services/api';
+import { clearToken, loadToken, login as apiLogin, logout as apiLogout, me, toApiError, type BackendUser } from '../services/api';
 
 export type Role = 'admin' | 'employee';
 
 type AuthState = {
   user: BackendUser | null;
   role: Role | null;
+  /** Raw backend role (admin/hr/employee) — UI hides accordingly; backend still enforces. */
+  backendRole: BackendUser['role'] | null;
   isLoading: boolean;
   error: string | null;
   /** Backend is the ONLY verifier: login returns JWT, /auth/me returns the role. */
@@ -61,14 +63,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    await clearToken();
+    await apiLogout(true);
     setUser(null);
     setError(null);
   }, []);
 
   const value = useMemo<AuthState>(() => {
     const role = user ? toPortal(user.role) : null;
-    return { user, role, isLoading, error, signIn, signOut, userName: user?.username ?? '' };
+    return { user, role, backendRole: user?.role ?? null, isLoading, error, signIn, signOut, userName: user?.username ?? '' };
   }, [user, isLoading, error, signIn, signOut]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
