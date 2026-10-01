@@ -30,7 +30,12 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-local-authentication",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow HRMS to use Face ID to unlock the app."
+        }
+      ],
       [
         "expo-notifications",
         {
