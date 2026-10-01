@@ -4,7 +4,7 @@ from sqlalchemy import func
 from typing import List
 
 from app.database import get_db
-from app import models, schemas
+from app import models, notify, schemas
 from app.audit import log
 from app.auth import get_current_user, require_roles
 from app.models import RoleEnum
@@ -31,6 +31,9 @@ def create_announcement(
     log(db, "announcement.create", "announcement", obj.id, current_user.id, body.title)
     db.commit()
     db.refresh(obj)
+    # Visible to everyone (including the sender) + push to all registered devices
+    for (uid,) in db.query(models.PushToken.user_id).distinct().all():
+        notify.send(db, uid, f"📢 {body.title}", body.body[:180], {"type": "announcement", "id": obj.id})
     return obj
 
 

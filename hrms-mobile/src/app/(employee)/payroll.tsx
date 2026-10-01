@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
@@ -65,7 +64,7 @@ export default function EmpPayroll() {
       <View style={{ paddingHorizontal: 16 }}>
         <AppBar
           title="Payroll"
-          right={<Ionicons name="notifications-outline" size={22} color={colors.text} />}
+          bellTo="/(employee)/announcements"
         />
       </View>
       <ScrollView

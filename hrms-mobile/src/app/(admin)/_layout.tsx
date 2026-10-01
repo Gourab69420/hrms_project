@@ -88,6 +88,7 @@ export default function AdminLayout() {
       <Tabs.Screen name="audit" options={{ href: null, title: 'Audit Log' }} />
       <Tabs.Screen name="comp" options={{ href: null, title: 'Loans & Salary' }} />
       <Tabs.Screen name="shifts" options={{ href: null, title: 'Shifts' }} />
+      <Tabs.Screen name="profile" options={{ href: null, title: 'Profile' }} />
       <Tabs.Screen name="departments" options={{ href: null, title: 'Departments' }} />
       <Tabs.Screen name="staff/edit/[id]" options={{ href: null, title: 'Edit Staff' }} />
       <Tabs.Screen name="leave-types" options={{ href: null, title: 'Leave Types' }} />

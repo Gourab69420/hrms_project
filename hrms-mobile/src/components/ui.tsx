@@ -8,6 +8,8 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {colors, radius, shadow, type, fonts} from '../theme';
 
@@ -23,14 +25,40 @@ export function Screen({ children, style }: { children: ReactNode; style?: Style
 export function AppBar({
   title,
   right,
+  bellTo,
+  noBack,
 }: {
   title: string;
   right?: ReactNode;
+  /** href for the notification bell (announcements/notices). Omit to hide the bell. */
+  bellTo?: string;
+  /** hide the auto back button (default: show whenever navigation can go back) */
+  noBack?: boolean;
 }) {
+  let canGoBack = false;
+  try {
+    canGoBack = !noBack && router.canGoBack();
+  } catch {
+    canGoBack = false;
+  }
   return (
     <View style={styles.appbar}>
-      <Text style={styles.appbarTitle}>{title}</Text>
-      <View style={styles.appbarRight}>{right}</View>
+      <View style={styles.appbarLeft}>
+        {canGoBack && (
+          <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backBtn}>
+            <Ionicons name="chevron-back" size={24} color={colors.text} />
+          </Pressable>
+        )}
+        <Text style={styles.appbarTitle}>{title}</Text>
+      </View>
+      <View style={styles.appbarRight}>
+        {bellTo && (
+          <Pressable onPress={() => router.push(bellTo as never)} hitSlop={10}>
+            <Ionicons name="notifications-outline" size={22} color={colors.text} />
+          </Pressable>
+        )}
+        {right}
+      </View>
     </View>
   );
 }
@@ -120,6 +148,8 @@ const styles = StyleSheet.create({
   },
   appbarTitle: { fontSize: 22, fontFamily: fonts.displayExtra, color: colors.text, letterSpacing: -0.3 },
   appbarRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  appbarLeft: { flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1 },
+  backBtn: { marginLeft: -8, padding: 4 },
   card: {
     backgroundColor: colors.card,
     borderColor: colors.border,

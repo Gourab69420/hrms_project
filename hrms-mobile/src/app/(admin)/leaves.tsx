@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -55,7 +54,7 @@ export default function AdminLeaves() {
       <View style={{ paddingHorizontal: 16 }}>
         <AppBar
           title="Leave Management"
-          right={<Ionicons name="notifications-outline" size={22} color={colors.text} />}
+          bellTo="/(admin)/announcements"
         />
       </View>
       <ScrollView

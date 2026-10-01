@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
@@ -44,7 +43,7 @@ export default function EmpLeaves() {
       <View style={{ paddingHorizontal: 16 }}>
         <AppBar
           title="Leaves"
-          right={<Ionicons name="notifications-outline" size={22} color={colors.text} />}
+          bellTo="/(employee)/announcements"
         />
       </View>
       <ScrollView

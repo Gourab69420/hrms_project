@@ -20,7 +20,7 @@ import {colors, radius, shadow, fonts} from '../../theme';
  * All buttons work: quick actions navigate, approve/reject hits PATCH /leaves/{id}/status.
  */
 export default function AdminDashboard() {
-  const { signOut, backendRole } = useAuth();
+  const { backendRole } = useAuth();
   const stats = useDashboardStats();
   const leaves = useDashboardLeaves();
   const action = useLeaveAction();
@@ -77,17 +77,12 @@ export default function AdminDashboard() {
       <View style={{ paddingHorizontal: 16 }}>
         <AppBar
           title="Dashboard"
+          bellTo="/(admin)/announcements"
           right={
             <View style={styles.barRight}>
-              <Ionicons name="notifications-outline" size={22} color={colors.text} />
               <Pressable
                 style={styles.profileDot}
-                onPress={() =>
-                  Alert.alert('Account', 'Sign out?', [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Sign out', style: 'destructive', onPress: () => signOut().then(() => router.replace('/')) },
-                  ])
-                }>
+                onPress={() => router.push('/(admin)/profile')}>
                 <Ionicons name="person" size={18} color="#FFF" />
               </Pressable>
             </View>

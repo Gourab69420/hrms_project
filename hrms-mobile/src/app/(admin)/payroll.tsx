@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import {
   ActivityIndicator,
@@ -23,7 +22,7 @@ export default function AdminPayroll() {
       <View style={{ paddingHorizontal: 16 }}>
         <AppBar
           title="Payroll"
-          right={<Ionicons name="notifications-outline" size={22} color={colors.text} />}
+          bellTo="/(admin)/announcements"
         />
       </View>
       <ScrollView

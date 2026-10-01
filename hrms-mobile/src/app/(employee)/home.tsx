@@ -42,7 +42,7 @@ export default function EmpHome() {
   return (
     <Screen style={{ paddingHorizontal: 0 }}>
       <View style={{ paddingHorizontal: 16 }}>
-        <AppBar title="Home" right={<Ionicons name="notifications-outline" size={22} color={colors.muted} />} />
+        <AppBar title="Home" bellTo="/(employee)/announcements" />
       </View>
       <ScrollView
         contentContainerStyle={styles.body}
