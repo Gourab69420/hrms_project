@@ -127,6 +127,7 @@ export function useEmployee(id: number) {
     data: q.data ? toUIEmployee(q.data, deptById) : null,
     isLoading: q.isLoading,
     error: q.error ? qError(q.error) : null,
+    refetch: q.refetch,
   };
 }
 

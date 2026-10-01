@@ -4,7 +4,7 @@ from typing import List
 
 from app.database import get_db
 from app import models, schemas
-from app.auth import require_roles
+from app.auth import get_current_user, require_roles
 from app.models import RoleEnum
 
 router = APIRouter(prefix="/departments", tags=["Departments"])
@@ -36,9 +36,19 @@ def get_department(dept_id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/{dept_id}", status_code=204, dependencies=[Depends(hr_admin)])
-def delete_department(dept_id: int, db: Session = Depends(get_db)):
+def delete_department(
+    dept_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
     dept = db.query(models.Department).filter(models.Department.id == dept_id).first()
     if not dept:
         raise HTTPException(status_code=404, detail="Department not found")
+    assigned = db.query(models.Employee).filter(models.Employee.department_id == dept_id).count()
+    if assigned:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot delete: {assigned} employee(s) still assigned. Move them first.",
+        )
     db.delete(dept)
     db.commit()

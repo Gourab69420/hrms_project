@@ -35,7 +35,7 @@ API docs: `http://<host>:8000/docs`.
 |---|---|---|
 | Auth | `POST /auth/register, /login, /refresh, /logout, /push-token`, `GET /auth/me` | public / self |
 | Departments | `POST/GET /, GET /{id}, DELETE /{id}` | admin,hr / all-auth |
-| Employees | `POST /, GET / (?search&skip&limit), GET /me, GET /{id}, PATCH /{id}, DELETE /{id}` | admin,hr / self / admin-delete |
+| Employees | `POST /, GET / (?search&skip&limit), GET /me, GET /{id}, PATCH /{id}, DELETE /{id}, DELETE /{id}/full (wipes login, attendance, leaves, payroll, docs…)` | admin,hr / self / admin-delete |
 | Attendance | `POST / (manual), POST /punch (self in/out), GET /employee/{id}, GET / (paged), DELETE /{id}` | admin,hr / self+punch / admin |
 | Leaves | `POST / (quota-enforced), GET /my, GET /team (reports), GET / (paged), DELETE /{id} (own pending), PATCH /{id}/status (manager+)` | self / manager+ |
 | Leave types | `GET /leave-types/, POST /leave-types/` | auth / admin,hr |

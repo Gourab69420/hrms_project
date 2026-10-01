@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -22,6 +22,13 @@ export default function Staff() {
   const [dept, setDept] = useState('All Staff');
   const { data, isLoading, error, refetch } = useEmployees(query);
   const { data: depts } = useDepartments();
+
+  // Edits/deletes land instantly when navigating back to this list.
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   const chips = useMemo(() => ['All Staff', ...depts.map((d) => d.name)], [depts]);
   const filtered = useMemo(

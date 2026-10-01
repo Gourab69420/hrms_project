@@ -165,6 +165,7 @@ export default function AdminDashboard() {
               { icon: 'exit-outline', label: 'Exits', to: '/(admin)/exits' },
               { icon: 'calendar-outline', label: 'Holidays', to: '/(admin)/holidays' },
               { icon: 'megaphone-outline', label: 'Announce', to: '/(admin)/announcements' },
+              { icon: 'business-outline', label: 'Depts', to: '/(admin)/departments' },
               { icon: 'cash-outline', label: 'Loans', to: '/(admin)/comp' },
               { icon: 'swap-horizontal-outline', label: 'Shifts', to: '/(admin)/shifts' },
               ...(backendRole === 'admin'

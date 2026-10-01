@@ -2,7 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -25,8 +26,15 @@ export default function StaffDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { backendRole } = useAuth();
   const empId = Number(id);
-  const { data: e, isLoading, error } = useEmployee(empId);
+  const { data: e, isLoading, error, refetch } = useEmployee(empId);
   const [counts, setCounts] = useState<{ att: number; leaves: number } | null>(null);
+
+  // Show saved edits the moment we return from the edit screen.
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   useEffect(() => {
     if (!Number.isFinite(empId)) return;
@@ -108,9 +116,19 @@ export default function StaffDetail() {
           </Pressable>
         </View>
 
+        <View style={styles.btns}>
+          <Pressable
+            style={[styles.btn, styles.btnOutline]}
+            onPress={() => router.push(`/(admin)/staff/edit/${e.id}` as never)}>
+            <Ionicons name="create-outline" size={18} color={colors.navy} />
+            <Text style={[styles.btnText, { color: colors.navy }]}>Edit details</Text>
+          </Pressable>
+        </View>
+
         <DocumentsSection empId={e.id} />
 
         {backendRole === 'admin' && (
+        <>
         <Pressable
           style={styles.danger}
           onPress={() =>
@@ -132,6 +150,44 @@ export default function StaffDetail() {
           }>
           <Text style={styles.dangerText}>Deactivate employee</Text>
         </Pressable>
+        <Pressable
+          style={styles.wipe}
+          onPress={() =>
+            Alert.alert(
+              'Delete permanently?',
+              `${e.first_name} ${e.last_name} and ALL their data (login, attendance, leaves, payroll, documents…) will be removed forever.`,
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Yes, delete all',
+                  style: 'destructive',
+                  onPress: () =>
+                    Alert.alert('Final confirmation', 'This cannot be undone. Delete everything?', [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Delete forever',
+                        style: 'destructive',
+                        onPress: async () => {
+                          try {
+                            const { deleteEmployeeFull } = await import('../../../services/api');
+                            const res = await deleteEmployeeFull(e.id);
+                            const total = Object.values(res.removed).reduce((s, n) => s + n, 0);
+                            Alert.alert('Deleted', `${res.deleted} removed with ${total} related record(s).`, [
+                              { text: 'OK', onPress: () => router.back() },
+                            ]);
+                          } catch (err) {
+                            Alert.alert('Failed', err instanceof Error ? err.message : 'Try again');
+                          }
+                        },
+                      },
+                    ]),
+                },
+              ],
+            )
+          }>
+          <Text style={styles.wipeText}>Delete employee + all data</Text>
+        </Pressable>
+        </>
         )}
       </ScrollView>
     </Screen>
@@ -251,6 +307,8 @@ const styles = StyleSheet.create({
   btnText: { color: '#FFF', fontFamily: fonts.displayExtra },
   danger: { alignItems: 'center', padding: 12 },
   dangerText: { color: colors.dangerDot, fontFamily: fonts.display },
+  wipe: { backgroundColor: colors.dangerDot, borderRadius: radius.md, minHeight: 48, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
+  wipeText: { color: '#FFF', fontFamily: fonts.displayExtra, fontSize: 14 },
   docTitle: { fontSize: 15, fontFamily: fonts.display, color: colors.text, marginBottom: 8 },
   docRow: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border },
   docName: { fontSize: 13, fontFamily: fonts.body, color: colors.text },

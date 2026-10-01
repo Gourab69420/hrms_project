@@ -472,5 +472,17 @@ export const reviewExit = (id: number, p: { status?: string; fnf_amount?: number
 export const getMyDocs = (empId: number) => api.get<Doc[]>(`/documents/employee/${empId}`).then((r) => r.data);
 export const downloadDocUrl = (id: number) => `${API_URL}/documents/${id}/download`;
 
+export type Department = { id: number; name: string; description: string | null; created_at: string };
+
+export const getDepartments = () => api.get<Department[]>('/departments/').then((r) => r.data);
+export const createDepartment = (p: { name: string; description?: string }) =>
+  api.post('/departments/', p).then((r) => r.data);
+export const deleteDepartment = (id: number) => api.delete(`/departments/${id}`);
+
+export const updateEmployee = (id: number, p: Record<string, unknown>) =>
+  api.patch(`/employees/${id}`, p).then((r) => r.data);
+export const deleteEmployeeFull = (id: number) =>
+  api.delete(`/employees/${id}/full`).then((r) => r.data as { deleted: string; removed: Record<string, number> });
+
 export const getAudit = (skip = 0) => api.get<Audit[]>('/audit-logs/', { params: { skip } }).then((r) => r.data);
 export const getInbox = () => api.get<Inbox>('/approvals/inbox').then((r) => r.data);
