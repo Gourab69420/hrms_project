@@ -141,6 +141,11 @@ export type BackendEmployee = {
   department_id: number | null;
   is_active: boolean;
   created_at: string;
+  present_today?: boolean;
+  worked_today?: boolean;
+  on_leave_today?: boolean;
+  today_check_in?: string | null;
+  today_check_out?: string | null;
 };
 
 export type BackendLeave = {

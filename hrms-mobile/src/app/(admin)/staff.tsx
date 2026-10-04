@@ -55,7 +55,11 @@ export default function Staff() {
             <Card style={styles.summary}>
               <View>
                 <Text style={styles.summaryNum}>{data.length} Employees</Text>
-                <Text style={styles.summarySub}>company roster</Text>
+                <Text style={styles.summarySub}>
+                  <Text style={styles.blueDotText}>● </Text>
+                  {data.filter((x) => x.presentToday).length} in now •{' '}
+                  {data.filter((x) => x.onLeaveToday).length} on leave today
+                </Text>
               </View>
               <Pressable style={styles.addBtn} onPress={() => router.push('/(admin)/staff/add')}>
                 <Ionicons name="add" size={18} color="#FFF" />
@@ -89,13 +93,24 @@ export default function Staff() {
             )}
           </>
         }
-        renderItem={({ item: e, index }) => (
+        renderItem={({ item: e }) => (
           <Pressable onPress={() => router.push(`/(admin)/staff/${e.id}` as never)}>
             <Card style={styles.row}>
               <View>
                 <Avatar initials={initialsOf(`${e.first_name} ${e.last_name}`)} tone={toneFor(e.id)} />
                 <View
-                  style={[styles.presence, { backgroundColor: e.status === 'Active' ? '#10B981' : '#F59E0B' }]}
+                  style={[
+                    styles.presence,
+                    {
+                      backgroundColor: e.status !== 'Active'
+                        ? '#94A3B8'
+                        : e.onLeaveToday
+                          ? '#F59E0B'
+                          : e.presentToday
+                            ? '#10B981'
+                            : '#CBD5E1',
+                    },
+                  ]}
                 />
               </View>
               <View style={styles.rowMid}>
@@ -106,7 +121,18 @@ export default function Staff() {
                   <StatusPill status={e.status} />
                 </View>
                 <Text style={styles.pos}>{e.position || '—'}</Text>
-                <Text style={styles.dept}>{e.department}</Text>
+                <Text style={styles.dept}>
+                  {e.department}
+                  {e.status === 'Active'
+                    ? e.onLeaveToday
+                      ? ' • On leave today'
+                      : e.presentToday
+                        ? ` • In since ${e.todayCheckIn ?? ''}`
+                        : e.workedToday
+                          ? ` • Done ${e.todayCheckIn ?? ''}–${e.todayCheckOut ?? ''}`
+                          : ' • Not punched in'
+                    : ''}
+                </Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={colors.muted} />
             </Card>
@@ -131,6 +157,7 @@ const styles = StyleSheet.create({
   body: { paddingHorizontal: 16, paddingTop: 4, gap: 10, paddingBottom: 24 },
   summary: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   summaryNum: { fontSize: 22, fontFamily: fonts.displayExtra, color: colors.text },
+  blueDotText: { color: colors.royal },
   summarySub: { fontSize: 13, color: colors.muted, marginTop: 4, fontFamily: fonts.body, },
   addBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,

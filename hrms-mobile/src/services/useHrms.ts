@@ -31,8 +31,15 @@ export type UIEmployee = {
   position: string;
   department: string;
   department_id: number | null;
-  status: 'Active' | 'On Leave';
+  /** Employment record state (HR-controlled), NOT today's punch. */
+  status: 'Active' | 'Inactive';
   hire_date: string;
+  /** Live daily presence from today's attendance + approved leave. */
+  presentToday: boolean;
+  workedToday: boolean;
+  onLeaveToday: boolean;
+  todayCheckIn: string | null;
+  todayCheckOut: string | null;
 };
 
 export type UILeave = {
@@ -76,8 +83,13 @@ function toUIEmployee(e: BackendEmployee, deptById: Map<number, string>): UIEmpl
     position: e.position ?? '',
     department: e.department_id != null ? (deptById.get(e.department_id) ?? '—') : '—',
     department_id: e.department_id,
-    status: e.is_active ? 'Active' : 'On Leave',
+    status: e.is_active ? 'Active' : 'Inactive',
     hire_date: e.hire_date ?? '',
+    presentToday: e.present_today ?? false,
+    workedToday: e.worked_today ?? false,
+    onLeaveToday: e.on_leave_today ?? false,
+    todayCheckIn: e.today_check_in ?? null,
+    todayCheckOut: e.today_check_out ?? null,
   };
 }
 

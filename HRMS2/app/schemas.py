@@ -71,6 +71,14 @@ class EmployeeOut(EmployeeCreate):
     class Config:
         from_attributes = True
 
+class EmployeePresenceOut(EmployeeOut):
+    """Employee + today's live presence (punched-in / on approved leave)."""
+    present_today: bool = False
+    worked_today: bool = False
+    on_leave_today: bool = False
+    today_check_in: Optional[str] = None
+    today_check_out: Optional[str] = None
+
 
 # --- Attendance ---
 class AttendanceCreate(BaseModel):

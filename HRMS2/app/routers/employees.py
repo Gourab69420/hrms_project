@@ -24,13 +24,14 @@ def create_employee(emp: schemas.EmployeeCreate, db: Session = Depends(get_db)):
     return obj
 
 
-@router.get("/", response_model=List[schemas.EmployeeOut], dependencies=[Depends(hr_admin)])
+@router.get("/", response_model=List[schemas.EmployeePresenceOut], dependencies=[Depends(hr_admin)])
 def list_employees(
     db: Session = Depends(get_db),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     search: str = Query("", max_length=100),
 ):
+    from datetime import date as _date
     q = db.query(models.Employee)
     if search.strip():
         like = f"%{search.strip()}%"
@@ -39,7 +40,43 @@ def list_employees(
             | models.Employee.last_name.ilike(like)
             | models.Employee.email.ilike(like)
         )
-    return q.order_by(models.Employee.id).offset(skip).limit(limit).all()
+    emps = q.order_by(models.Employee.id).offset(skip).limit(limit).all()
+    today = _date.today()
+    ids = [e.id for e in emps]
+    att = {
+        a.employee_id: a
+        for a in db.query(models.Attendance)
+        .filter(models.Attendance.employee_id.in_(ids), models.Attendance.date == today)
+        .all()
+    } if ids else {}
+    on_leave = {
+        r[0]
+        for r in db.query(models.Leave.employee_id)
+        .filter(
+            models.Leave.employee_id.in_(ids),
+            models.Leave.status == models.LeaveStatusEnum.approved,
+            models.Leave.start_date <= today,
+            models.Leave.end_date >= today,
+        ).all()
+    } if ids else set()
+    out = []
+    for e in emps:
+        a = att.get(e.id)
+        ci = a.check_in.strftime("%H:%M") if a and a.check_in else None
+        co = a.check_out.strftime("%H:%M") if a and a.check_out else None
+        out.append({
+            "id": e.id, "first_name": e.first_name, "last_name": e.last_name,
+            "email": e.email, "phone": e.phone, "position": e.position,
+            "hire_date": e.hire_date, "department_id": e.department_id,
+            "manager_id": e.manager_id, "shift_id": e.shift_id,
+            "is_active": e.is_active, "created_at": e.created_at,
+            "present_today": bool(a and a.check_in and not a.check_out),
+            "worked_today": bool(a and a.check_in),
+            "on_leave_today": e.id in on_leave,
+            "today_check_in": ci,
+            "today_check_out": co,
+        })
+    return out
 
 
 @router.get("/me", response_model=schemas.EmployeeOut)
