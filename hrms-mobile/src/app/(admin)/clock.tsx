@@ -119,7 +119,7 @@ export default function Clock() {
         )}
         {emps.map((e, i) => {
           const a = byEmp.get(e.id);
-          const status = !a ? 'Absent' : a.status === 'present' ? 'Present' : a.status === 'late' ? 'Present' : 'On Leave';
+          const status = !a ? 'Absent' : a.status === 'present' ? 'Present' : a.status === 'late' ? 'Late' : 'On Leave';
           const shift =
             a?.check_in && a?.check_out
               ? `${a.check_in.slice(11, 16)} – ${a.check_out.slice(11, 16)}`

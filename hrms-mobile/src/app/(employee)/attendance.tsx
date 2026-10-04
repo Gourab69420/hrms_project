@@ -75,7 +75,7 @@ export default function EmpAttendance() {
         <Card>
           <View style={styles.liveTop}>
             <Text style={styles.liveDot}>{todays ? (punchedIn ? '🟢  PUNCHED IN' : '✅  DAY COMPLETE') : '⚪  NOT PUNCHED IN'}</Text>
-            {todays && <StatusPill status={todays.status === 'late' ? 'Pending' : 'Present'} />}
+            {todays && <StatusPill status={todays.status === 'late' ? 'Late' : 'Present'} />}
           </View>
           {todays && (
             <Text style={styles.punched}>
@@ -133,7 +133,7 @@ export default function EmpAttendance() {
               </Text>
             </View>
             <View style={{ alignItems: 'flex-end' }}>
-              <StatusPill status={l.status === 'late' ? 'Pending' : l.status === 'present' ? 'Present' : 'On Leave'} />
+              <StatusPill status={l.status === 'late' ? 'Late' : l.status === 'present' ? 'Present' : 'On Leave'} />
             </View>
           </Card>
         ))}

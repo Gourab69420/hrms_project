@@ -74,6 +74,7 @@ const pill: Record<string, { bg: string; border: string; text: string; dot: stri
   Present: { bg: colors.successBg, border: colors.successBorder, text: colors.success, dot: colors.successDot },
   Pending: { bg: '#EAF0FF', border: colors.royalBorder, text: colors.royal, dot: colors.royal },
   'On Leave': { bg: colors.warningBg, border: colors.warningBorder, text: colors.warning, dot: colors.warningDot },
+  Late: { bg: colors.warningBg, border: colors.warningBorder, text: colors.warning, dot: colors.warningDot },
   Rejected: { bg: colors.dangerBg, border: colors.dangerBorder, text: colors.danger, dot: colors.dangerDot },
   Inactive: { bg: '#F1F5F9', border: colors.border, text: colors.muted, dot: colors.placeholder },
 };

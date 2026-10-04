@@ -20,7 +20,7 @@ import {colors, radius, shadow, fonts} from '../../theme';
 export default function Staff() {
   const [query, setQuery] = useState('');
   const [dept, setDept] = useState('All Staff');
-  const { data, isLoading, error, refetch } = useEmployees(query);
+  const { data, isLoading, error, refetch } = useEmployees(query, true);
   const { data: depts } = useDepartments();
 
   // Edits/deletes land instantly when navigating back to this list.
@@ -123,15 +123,11 @@ export default function Staff() {
                 <Text style={styles.pos}>{e.position || '—'}</Text>
                 <Text style={styles.dept}>
                   {e.department}
-                  {e.status === 'Active'
-                    ? e.onLeaveToday
-                      ? ' • On leave today'
-                      : e.presentToday
-                        ? ` • In since ${e.todayCheckIn ?? ''}`
-                        : e.workedToday
-                          ? ` • Done ${e.todayCheckIn ?? ''}–${e.todayCheckOut ?? ''}`
-                          : ' • Not punched in'
-                    : ''}
+                  {e.status === 'Active' && e.onLeaveToday
+                    ? ' • On leave today'
+                    : e.status === 'Active' && e.presentToday
+                      ? ` • In since ${e.todayCheckIn ?? ''}`
+                      : ''}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={colors.muted} />

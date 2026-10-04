@@ -112,11 +112,12 @@ export function leaveToUI(l: BackendLeave, byId: Map<number, BackendEmployee>): 
 
 /* ---------- admin ---------- */
 
-export function useEmployees(search = '') {
+export function useEmployees(search = '', live = false) {
   const { data: depts } = useDepartments();
   const q = useQuery({
     queryKey: ['employees', search],
     queryFn: () => listEmployees(search),
+    refetchInterval: live ? 20_000 : false,
   });
   const deptById = new Map((depts ?? []).map((d) => [d.id, d.name]));
   return {
@@ -180,6 +181,12 @@ export type DashboardStats = {
 
 export function useDashboardStats() {
   const { user } = useAuth();
+  const meQ = useQuery({
+    queryKey: ['employee-me'],
+    queryFn: async () => (await api.get('/employees/me')).data as { first_name: string },
+    enabled: !!user?.employee_id,
+    staleTime: 5 * 60_000,
+  });
   const q = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () =>
@@ -198,7 +205,7 @@ export function useDashboardStats() {
   const s = q.data;
   const data: DashboardStats | null = s
     ? {
-        user: user?.username.split('@')[0] ?? 'Admin',
+        user: meQ.data?.first_name ?? user?.username.split('@')[0] ?? 'Admin',
         date: new Date(s.date + 'T00:00:00').toDateString(),
         totalStaff: s.total_staff,
         totalStaffDelta: '',
