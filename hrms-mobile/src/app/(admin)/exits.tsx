@@ -11,8 +11,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { AppBar, Avatar, Card, Screen, StatusPill } from '../../components/ui';
+import { AppBar, Avatar, Card, Screen, initialsOf, toneFor, StatusPill } from '../../components/ui';
 import { getAllExits, reviewExit } from '../../services/api';
+import { useEmployees } from '../../services/useHrms';
 import { useAuth } from '../../store/AuthContext';
 import { qError } from '../../services/useHrms';
 import { colors, fonts, radius } from '../../theme';
@@ -22,7 +23,12 @@ export default function Exits() {
   const qc = useQueryClient();
   const { backendRole } = useAuth();
   const q = useQuery({ queryKey: ['exits-all'], queryFn: getAllExits });
+  const { data: emps } = useEmployees();
   const [fnf, setFnf] = useState<Record<number, string>>({});
+  const nameOf = (id: number) => {
+    const e = emps.find((x) => x.id === id);
+    return e ? `${e.first_name} ${e.last_name}` : `EMP-${String(id).padStart(4, '0')}`;
+  };
 
   const review = (id: number, status: string) => {
     const amount = fnf[id]?.trim() === '' ? undefined : Number(fnf[id]);
@@ -61,12 +67,12 @@ export default function Exits() {
             <Text style={styles.err}>{qError(q.error)}</Text>
           </Card>
         )}
-        {(q.data ?? []).map((x, i) => (
+        {(q.data ?? []).map((x) => (
           <Card key={x.id} style={styles.card}>
             <View style={styles.top}>
-              <Avatar initials={`E${x.employee_id}`} tone={i} />
+              <Avatar initials={initialsOf(nameOf(x.employee_id))} tone={toneFor(x.employee_id)} />
               <View style={styles.mid}>
-                <Text style={styles.name}>EMP-{String(x.employee_id).padStart(4, '0')}</Text>
+                <Text style={styles.name}>{nameOf(x.employee_id)}</Text>
                 <Text style={styles.dates}>
                   Resigned {x.resignation_date} → LWD {x.last_working_date}
                 </Text>

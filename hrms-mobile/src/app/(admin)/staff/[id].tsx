@@ -14,7 +14,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { AppBar, Avatar, Card, Screen, StatusPill } from '../../../components/ui';
+import {AppBar, Avatar, Card, Screen, StatusPill, initialsOf, toneFor} from '../../../components/ui';
 import { api, downloadDocUrl, getMyDocs, type Doc } from '../../../services/api';
 import { useAuth } from '../../../store/AuthContext';
 import { useEmployee } from '../../../services/useHrms';
@@ -80,7 +80,7 @@ export default function StaffDetail() {
       </View>
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
         <Card style={styles.head}>
-          <Avatar initials={`${e.first_name[0] ?? ''}${e.last_name[0] ?? ''}`.toUpperCase()} tone={0} />
+          <Avatar initials={initialsOf(`${e.first_name} ${e.last_name}`)} tone={0} />
           <View style={{ flex: 1 }}>
             <Text style={styles.name}>
               {e.first_name} {e.last_name}

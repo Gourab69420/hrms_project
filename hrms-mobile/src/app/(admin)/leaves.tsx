@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { AppBar, Avatar, Card, Screen, StatusPill } from '../../components/ui';
+import {AppBar, Avatar, Card, Screen, StatusPill, initialsOf, toneFor} from '../../components/ui';
 import { useAdminLeaveQueue, useLeaveAction } from '../../services/useHrms';
 import {colors, radius, fonts} from '../../theme';
 
@@ -109,7 +109,7 @@ export default function AdminLeaves() {
           <Card key={l.id} style={styles.card}>
             <View style={styles.top}>
               <Avatar
-                initials={l.employee.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
+                initials={initialsOf(l.employee)}
                 tone={i}
               />
               <View style={styles.mid}>

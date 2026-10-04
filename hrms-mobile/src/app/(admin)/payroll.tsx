@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { AppBar, Avatar, Card, Screen, StatusPill } from '../../components/ui';
+import {AppBar, Avatar, Card, Screen, StatusPill, initialsOf, toneFor} from '../../components/ui';
 import { useAdminPayrolls } from '../../services/useHrms';
 import {colors, radius, fonts} from '../../theme';
 
@@ -56,7 +56,7 @@ export default function AdminPayroll() {
         {data.map((r, i) => (
           <Card key={r.id} style={styles.row}>
             <Avatar
-              initials={r.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
+              initials={initialsOf(r.name)}
               tone={i}
             />
             <View style={styles.mid}>

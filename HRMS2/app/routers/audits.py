@@ -13,8 +13,17 @@ hr_admin = require_roles(RoleEnum.admin, RoleEnum.hr)
 
 
 @router.get("/audit-logs/", response_model=List[schemas.AuditOut], dependencies=[Depends(hr_admin)])
-def list_audit(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
-    return db.query(models.AuditLog).order_by(models.AuditLog.id.desc()).offset(skip).limit(min(limit, 1000)).all()
+def list_audit(
+    db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100,
+    mine: bool = False,
+    current_user: models.User = Depends(get_current_user),
+):
+    q = db.query(models.AuditLog)
+    if mine:
+        q = q.filter(models.AuditLog.actor_user_id == current_user.id)
+    return q.order_by(models.AuditLog.id.desc()).offset(skip).limit(min(limit, 1000)).all()
 
 
 @router.get("/approvals/inbox")

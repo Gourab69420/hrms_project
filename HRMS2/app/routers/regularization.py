@@ -67,6 +67,17 @@ def list_all(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
     return db.query(models.Regularization).order_by(models.Regularization.id.desc()).offset(skip).limit(min(limit, 1000)).all()
 
 
+@router.get("/pending/count")
+def pending_count(db: Session = Depends(get_db), _=Depends(get_current_user)):
+    """Pending-only regularization count (never historical totals)."""
+    n = (
+        db.query(models.Regularization)
+        .filter(models.Regularization.status == models.LeaveStatusEnum.pending)
+        .count()
+    )
+    return {"pending": n}
+
+
 @router.patch("/{rid}/status", response_model=schemas.RegularizationOut)
 def decide_reg(
     rid: int,
@@ -82,7 +93,13 @@ def decide_reg(
     reg.status = update.status
     reg.reviewed_by = current_user.id
     if update.status == models.LeaveStatusEnum.approved:
-        # Apply corrected times onto the attendance record (create if missing)
+        # Apply corrected times onto the attendance record (create if missing).
+        # Stored timezone-aware so later punch-out math never mixes naive/aware.
+        from datetime import timezone as _tz
+
+        def _aware(dt):
+            return dt if dt is None or dt.tzinfo else dt.replace(tzinfo=_tz.utc)
+
         att = (
             db.query(models.Attendance)
             .filter(models.Attendance.employee_id == reg.employee_id, models.Attendance.date == reg.date)
@@ -92,9 +109,9 @@ def decide_reg(
             att = models.Attendance(employee_id=reg.employee_id, date=reg.date)
             db.add(att)
         if reg.req_check_in:
-            att.check_in = reg.req_check_in
+            att.check_in = _aware(reg.req_check_in)
         if reg.req_check_out:
-            att.check_out = reg.req_check_out
+            att.check_out = _aware(reg.req_check_out)
         att.status = models.AttendanceStatusEnum.present
         if att.check_in and att.check_out:
             att.work_hours = round((att.check_out - att.check_in).total_seconds() / 3600, 2)

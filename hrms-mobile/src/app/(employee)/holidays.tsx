@@ -24,11 +24,16 @@ export default function Holidays() {
         )}
         <Text style={styles.h}>Upcoming ({upcoming.length})</Text>
         {upcoming.map((h) => (
-          <Card key={h.id} style={styles.row}>
+          <Card key={`${h.source}-${h.id}-${h.date}`} style={styles.row}>
             <View style={styles.mid}>
               <Text style={styles.name}>🎉 {h.name}</Text>
               <Text style={styles.date}>{h.date}</Text>
             </View>
+            {h.source === 'appsheet' && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>official sheet</Text>
+              </View>
+            )}
           </Card>
         ))}
         <Text style={styles.h}>Past</Text>
@@ -59,6 +64,8 @@ const styles = StyleSheet.create({
   mid: { flex: 1 },
   name: { fontSize: 14, fontFamily: fonts.display, color: colors.text },
   date: { fontSize: 12, fontFamily: fonts.body, color: colors.muted, marginTop: 2, fontVariant: ['tabular-nums'] },
+  badge: { backgroundColor: colors.successBg, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
+  badgeText: { fontSize: 10, fontFamily: fonts.display, color: colors.success },
   muted: { color: colors.muted, fontFamily: fonts.body, textAlign: 'center' },
   err: { color: colors.dangerDot, fontFamily: fonts.body },
 });

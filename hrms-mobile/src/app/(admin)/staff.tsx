@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { AppBar, Avatar, Card, Screen, SearchBar, StatusPill } from '../../components/ui';
+import {AppBar, Avatar, Card, Screen, SearchBar, StatusPill, initialsOf, toneFor} from '../../components/ui';
 import { useDepartments, useEmployees } from '../../services/useHrms';
 import {colors, radius, shadow, fonts} from '../../theme';
 
@@ -36,7 +36,6 @@ export default function Staff() {
     [data, dept],
   );
 
-  const initials = (fn: string, ln: string) => `${fn[0] ?? ''}${ln[0] ?? ''}`.toUpperCase();
 
   return (
     <Screen style={{ paddingHorizontal: 0 }}>
@@ -94,7 +93,7 @@ export default function Staff() {
           <Pressable onPress={() => router.push(`/(admin)/staff/${e.id}` as never)}>
             <Card style={styles.row}>
               <View>
-                <Avatar initials={initials(e.first_name, e.last_name)} tone={index} />
+                <Avatar initials={initialsOf(`${e.first_name} ${e.last_name}`)} tone={toneFor(e.id)} />
                 <View
                   style={[styles.presence, { backgroundColor: e.status === 'Active' ? '#10B981' : '#F59E0B' }]}
                 />

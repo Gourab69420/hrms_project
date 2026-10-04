@@ -10,8 +10,9 @@ import {
   Text,
   View,
 } from 'react-native';
-import { AppBar, Avatar, Card, Screen, StatusPill } from '../../components/ui';
+import { AppBar, Avatar, Card, Screen, initialsOf, toneFor, StatusPill } from '../../components/ui';
 import { decideReg, getAllRegs, type Reg } from '../../services/api';
+import { useEmployees, useRegPending } from '../../services/useHrms';
 import { colors, fonts, radius } from '../../theme';
 
 /** Admin regularization queue — approve applies corrected times onto attendance. */
@@ -19,7 +20,13 @@ export default function Regs() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<'pending' | 'all'>('pending');
   const q = useQuery({ queryKey: ['regs-all'], queryFn: getAllRegs });
+  const { data: emps } = useEmployees();
+  const { pending, refetch: refetchCount } = useRegPending();
   const rows = (q.data ?? []).filter((r) => tab === 'all' || r.status === 'pending');
+  const nameOf = (id: number) => {
+    const e = emps.find((x) => x.id === id);
+    return e ? `${e.first_name} ${e.last_name}` : `EMP-${String(id).padStart(4, '0')}`;
+  };
 
   const decide = (r: Reg, status: 'approved' | 'rejected') => {
     Alert.alert(`${status === 'approved' ? 'Approve' : 'Reject'}`, `Correction for ${r.date}?`, [
@@ -31,6 +38,9 @@ export default function Regs() {
           try {
             await decideReg(r.id, status);
             qc.invalidateQueries({ queryKey: ['regs-all'] });
+            qc.invalidateQueries({ queryKey: ['regs-pending-count'] });
+            qc.invalidateQueries({ queryKey: ['inbox'] });
+            refetchCount();
           } catch (e) {
             Alert.alert('Failed', e instanceof Error ? e.message : 'Try again');
           }
@@ -46,24 +56,24 @@ export default function Regs() {
       </View>
       <ScrollView
         contentContainerStyle={styles.body}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={() => q.refetch()} />}>
+        refreshControl={<RefreshControl refreshing={false} onRefresh={() => { q.refetch(); refetchCount(); }} />}>
         <View style={styles.tabs}>
           {(['pending', 'all'] as const).map((t) => (
             <Pressable key={t} onPress={() => setTab(t)} style={[styles.tab, tab === t && styles.tabOn]}>
               <Text style={[styles.tabText, tab === t && styles.tabTextOn]}>
-                {t === 'pending' ? 'Pending' : 'All'}
+                {t === 'pending' ? `Pending (${pending})` : 'All'}
               </Text>
             </Pressable>
           ))}
         </View>
         {q.isLoading && <ActivityIndicator color={colors.navy} style={{ marginTop: 16 }} />}
-        {rows.map((r, i) => (
+        {rows.map((r) => (
           <Card key={r.id} style={styles.card}>
             <View style={styles.top}>
-              <Avatar initials={`E${r.employee_id}`} tone={i} />
+              <Avatar initials={initialsOf(nameOf(r.employee_id))} tone={toneFor(r.employee_id)} />
               <View style={styles.mid}>
                 <Text style={styles.name}>
-                  EMP-{String(r.employee_id).padStart(4, '0')} <Text style={styles.dim}>• {r.date}</Text>
+                  {nameOf(r.employee_id)} <Text style={styles.dim}>• {r.date}</Text>
                 </Text>
                 <Text style={styles.times}>
                   In {r.req_check_in?.slice(11, 16) ?? '—'} → Out {r.req_check_out?.slice(11, 16) ?? '—'}

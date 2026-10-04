@@ -12,21 +12,18 @@ import {
   View,
 } from 'react-native';
 import { AppBar, Card, Screen } from '../../components/ui';
-import { createLeaveType, createShift, deleteShift, getLeaveTypes, getShifts } from '../../services/api';
+import { createShift, deleteShift, getShifts } from '../../services/api';
 import { qError } from '../../services/useHrms';
 import { colors, fonts, radius } from '../../theme';
 
-/** Shifts + leave-type masters. Shift delete is blocked while assigned. */
+/** Shift masters. Shift delete is blocked while assigned. Quotas live under Holidays (admin-only). */
 export default function Shifts() {
   const qc = useQueryClient();
   const shQ = useQuery({ queryKey: ['shifts'], queryFn: getShifts });
-  const ltQ = useQuery({ queryKey: ['leave-types'], queryFn: getLeaveTypes });
   const [name, setName] = useState('Evening');
   const [start, setStart] = useState('13:00');
   const [end, setEnd] = useState('21:30');
   const [late, setLate] = useState('13:30');
-  const [ltName, setLtName] = useState('');
-  const [quota, setQuota] = useState('');
   const [busy, setBusy] = useState(false);
 
   const addShift = async () => {
@@ -42,25 +39,10 @@ export default function Shifts() {
     }
   };
 
-  const addType = async () => {
-    if (!ltName.trim() || !quota.trim()) return Alert.alert('Missing', 'Name + yearly quota required.');
-    setBusy(true);
-    try {
-      await createLeaveType({ name: ltName.trim(), yearly_quota: Number(quota), paid: true });
-      setLtName('');
-      setQuota('');
-      qc.invalidateQueries({ queryKey: ['leave-types'] });
-    } catch (e) {
-      Alert.alert('Failed', e instanceof Error ? e.message : 'Try again');
-    } finally {
-      setBusy(false);
-    }
-  };
-
   return (
     <Screen style={{ paddingHorizontal: 0 }}>
       <View style={{ paddingHorizontal: 16 }}>
-        <AppBar title="Shifts & Types" />
+        <AppBar title="Shifts" />
       </View>
       <ScrollView
         contentContainerStyle={styles.body}
@@ -69,7 +51,6 @@ export default function Shifts() {
             refreshing={false}
             onRefresh={() => {
               shQ.refetch();
-              ltQ.refetch();
             }}
           />
         }>
@@ -124,36 +105,9 @@ export default function Shifts() {
             {busy ? <ActivityIndicator color="#FFF" /> : <Text style={styles.addText}>Add shift</Text>}
           </Pressable>
         </Card>
-
-        <Text style={styles.h}>Leave types (yearly paid quota)</Text>
-        {(ltQ.data ?? []).map((t) => (
-          <Card key={t.id} style={styles.row}>
-            <View style={styles.mid}>
-              <Text style={styles.name}>{t.name}</Text>
-              <Text style={styles.meta}>
-                {t.yearly_quota}/yr • {t.paid ? 'paid' : 'unpaid'}
-              </Text>
-            </View>
-          </Card>
-        ))}
-        <Card style={styles.form}>
-          <View style={styles.grid}>
-            <View style={styles.cell}>
-              <Text style={styles.cl}>Name</Text>
-              <TextInput value={ltName} onChangeText={setLtName} style={styles.input} placeholder="paternity" placeholderTextColor={colors.placeholder} />
-            </View>
-            <View style={styles.cell}>
-              <Text style={styles.cl}>Quota</Text>
-              <TextInput value={quota} onChangeText={setQuota} keyboardType="numeric" style={styles.input} placeholder="5" placeholderTextColor={colors.placeholder} />
-            </View>
-          </View>
-          <Pressable style={styles.add} onPress={addType} disabled={busy}>
-            <Text style={styles.addText}>Add leave type</Text>
-          </Pressable>
-        </Card>
-        {(shQ.error || ltQ.error) && (
+        {shQ.error && (
           <Card>
-            <Text style={styles.err}>{shQ.error ? qError(shQ.error) : ltQ.error ? qError(ltQ.error) : ''}</Text>
+            <Text style={styles.err}>{qError(shQ.error)}</Text>
           </Card>
         )}
       </ScrollView>

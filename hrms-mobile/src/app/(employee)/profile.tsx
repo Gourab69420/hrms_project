@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import { AppBar, Card, Screen, StatusPill } from '../../components/ui';
+import { AppBar, Avatar, Card, Screen, StatusPill, initialsOf, toneFor } from '../../components/ui';
 import { lockEnabled, setLockEnabled, supported, unlock } from '../../services/applock';
 import { useAuth } from '../../store/AuthContext';
 import { useMyProfile } from '../../services/useHrms';
@@ -79,11 +79,7 @@ export default function EmpProfile() {
         refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} />}>
         <Card>
           <View style={styles.id}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarT}>
-                {(e.first_name[0] ?? '').toUpperCase()}
-              </Text>
-            </View>
+            <Avatar initials={initialsOf(`${e.first_name} ${e.last_name}`)} tone={toneFor(e.id)} size={64} />
             <View style={{ flex: 1 }}>
               <Text style={styles.name}>
                 {e.first_name} {e.last_name}{' '}
@@ -149,8 +145,6 @@ const styles = StyleSheet.create({
   err: { color: colors.dangerDot, fontFamily: fonts.body, },
   body: { paddingHorizontal: 16, paddingTop: 4, gap: 12 },
   id: { flexDirection: 'row', gap: 12, alignItems: 'center' },
-  avatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.navy, alignItems: 'center', justifyContent: 'center' },
-  avatarT: { color: '#FFF', fontSize: 26, fontFamily: fonts.displayExtra },
   name: { fontSize: 17, fontFamily: fonts.displayExtra, color: colors.text },
   code: { fontSize: 12, fontFamily: fonts.semiBold, color: colors.muted },
   role: { fontSize: 13, color: colors.muted, marginTop: 2, fontFamily: fonts.body, },

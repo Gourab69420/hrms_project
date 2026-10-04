@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { AppBar, Avatar, Card, Screen, SectionHeader, StatusPill } from '../../components/ui';
+import {AppBar, Avatar, Card, Screen, SectionHeader, StatusPill, initialsOf, toneFor} from '../../components/ui';
 import { useAuth } from '../../store/AuthContext';
 import { useDashboardLeaves, useDashboardStats, useLeaveAction } from '../../services/useHrms';
 import {colors, radius, shadow, fonts} from '../../theme';
@@ -161,11 +161,8 @@ export default function AdminDashboard() {
               { icon: 'calendar-outline', label: 'Holidays', to: '/(admin)/holidays' },
               { icon: 'megaphone-outline', label: 'Announce', to: '/(admin)/announcements' },
               { icon: 'business-outline', label: 'Depts', to: '/(admin)/departments' },
-              { icon: 'cash-outline', label: 'Loans', to: '/(admin)/comp' },
+              { icon: 'cash-outline', label: 'Salary', to: '/(admin)/comp' },
               { icon: 'swap-horizontal-outline', label: 'Shifts', to: '/(admin)/shifts' },
-              ...(backendRole === 'admin'
-                ? [{ icon: 'list-outline', label: 'Audit', to: '/(admin)/audit' } as const]
-                : []),
             ] as const
           ).map((a) => (
             <Pressable key={a.label} style={styles.manage} onPress={() => router.push(a.to as never)}>
@@ -191,7 +188,7 @@ export default function AdminDashboard() {
         {leaves.data.map((l, i) => (
           <Card key={l.id} style={styles.leave}>
             <Avatar
-              initials={l.employee.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
+              initials={initialsOf(l.employee)}
               tone={i}
             />
             <Pressable style={styles.leaveMid} onPress={() => router.push('/(admin)/leaves')}>

@@ -80,11 +80,10 @@ export default function EmployeeLayout() {
       <Tabs.Screen name="announcements" options={{ href: null, title: 'Announcements' }} />
       <Tabs.Screen name="holidays" options={{ href: null, title: 'Holidays' }} />
       <Tabs.Screen name="regularization" options={{ href: null, title: 'Regularization' }} />
-      <Tabs.Screen name="loans" options={{ href: null, title: 'Loans' }} />
       <Tabs.Screen name="tickets" options={{ href: null, title: 'Helpdesk' }} />
       <Tabs.Screen name="exit" options={{ href: null, title: 'Exit' }} />
       <Tabs.Screen name="documents" options={{ href: null, title: 'Documents' }} />
-      <Tabs.Screen name="team" options={{ href: null, title: 'Team Approvals' }} />
+      <Tabs.Screen name="team" options={{ href: null, title: 'My Team' }} />
     </Tabs>
   );
 }

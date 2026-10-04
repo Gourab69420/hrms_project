@@ -306,7 +306,8 @@ export type Balance = {
   paid: boolean;
 };
 
-export type Holiday = { id: number; date: string; name: string; description: string | null };
+export type Holiday = { id: number; date: string; name: string; description: string | null; source?: string };
+export type ExternalStatus = { configured: boolean; table: string; hint: string | null };
 export type Shift = {
   id: number;
   name: string;
@@ -403,6 +404,9 @@ export const createLeaveType = (p: { name: string; yearly_quota: number; paid: b
   api.post('/leave-types/', p).then((r) => r.data);
 
 export const getHolidays = () => api.get<Holiday[]>('/holidays/').then((r) => r.data);
+export const getExternalStatus = () => api.get<ExternalStatus>('/holidays/external/status').then((r) => r.data);
+export const syncHolidays = () =>
+  api.post<{ added: number; updated: number; source: string }>('/holidays/sync').then((r) => r.data);
 export const createHoliday = (p: { date: string; name: string; description?: string }) =>
   api.post('/holidays/', p).then((r) => r.data);
 export const deleteHoliday = (id: number) => api.delete(`/holidays/${id}`);
@@ -484,5 +488,11 @@ export const updateEmployee = (id: number, p: Record<string, unknown>) =>
 export const deleteEmployeeFull = (id: number) =>
   api.delete(`/employees/${id}/full`).then((r) => r.data as { deleted: string; removed: Record<string, number> });
 
-export const getAudit = (skip = 0) => api.get<Audit[]>('/audit-logs/', { params: { skip } }).then((r) => r.data);
+export const getAudit = (skip = 0, mine = false) =>
+  api.get<Audit[]>('/audit-logs/', { params: { skip, mine } }).then((r) => r.data);
 export const getInbox = () => api.get<Inbox>('/approvals/inbox').then((r) => r.data);
+export const getRegPendingCount = () =>
+  api.get<{ pending: number }>('/regularization/pending/count').then((r) => r.data.pending);
+export const autoPunchOut = () =>
+  api.post<{ closed: number; at: string }>('/attendance/auto-punch-out').then((r) => r.data);
+export const getTeam = () => api.get<BackendEmployee[]>('/employees/team').then((r) => r.data);

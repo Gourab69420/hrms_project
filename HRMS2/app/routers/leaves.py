@@ -72,9 +72,10 @@ def team_leaves(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    """Pending leaves of direct reports (+ own). Managers use this as their inbox."""
-    mine = [current_user.employee_id] if current_user.employee_id else []
-    ids = list({*report_ids(db, current_user), *mine})
+    """Pending leaves of direct reports. Managers only — plain employees get 403."""
+    if not is_privileged(current_user) and not report_ids(db, current_user):
+        raise HTTPException(status_code=403, detail="Leave approvals are restricted to admins and managers")
+    ids = list({*report_ids(db, current_user), *([current_user.employee_id] if current_user.employee_id else [])})
     if not ids:
         return []
     return (

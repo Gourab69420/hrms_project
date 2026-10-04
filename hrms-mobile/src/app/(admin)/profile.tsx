@@ -1,15 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { AppBar, Avatar, Card, Screen, StatusPill } from '../../components/ui';
+import {AppBar, Avatar, Card, Screen, StatusPill, initialsOf, toneFor} from '../../components/ui';
 import { useAuth } from '../../store/AuthContext';
-import { useEmployee } from '../../services/useHrms';
+import { useEmployee, useMyActivities } from '../../services/useHrms';
 import { colors, fonts, radius } from '../../theme';
 
 /** Admin's own profile — info + self edit + sign out. Only ever shows the logged-in admin. */
 export default function AdminProfile() {
   const { signOut, user, backendRole } = useAuth();
   const { data: e, isLoading, error, refetch } = useEmployee(user?.employee_id ?? NaN);
+  const acts = useMyActivities();
 
   if (isLoading) {
     return (
@@ -40,7 +41,7 @@ export default function AdminProfile() {
           <>
             <Card style={styles.head}>
               <Avatar
-                initials={`${e.first_name[0] ?? ''}${e.last_name[0] ?? ''}`.toUpperCase()}
+                initials={initialsOf(`${e.first_name} ${e.last_name}`)}
                 tone={0}
               />
               <View style={styles.mid}>
@@ -77,6 +78,27 @@ export default function AdminProfile() {
           }}>
           <Text style={styles.signoutText}>⇥   Sign Out of Account</Text>
         </Pressable>
+
+        <Card>
+          <Text style={styles.actTitle}>My Activities</Text>
+          <Text style={styles.actSub}>Your recent actions across the system</Text>
+          {acts.data.slice(0, 20).map((a) => (
+            <View key={a.id} style={styles.actRow}>
+              <View style={styles.actMid}>
+                <Text style={styles.actAction}>{a.action}</Text>
+                <Text style={styles.actMeta}>
+                  {a.entity}
+                  {a.entity_id ? ` #${a.entity_id}` : ''}
+                  {a.detail ? ` • ${a.detail}` : ''}
+                </Text>
+              </View>
+              <Text style={styles.actTime}>{a.created_at.slice(0, 16).replace('T', ' ')}</Text>
+            </View>
+          ))}
+          {acts.data.length === 0 && !acts.isLoading && (
+            <Text style={styles.actSub}>No activities recorded yet.</Text>
+          )}
+        </Card>
         <Text style={styles.ver}>Workforce OS • v2.4.1 (Build 402)</Text>
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -112,5 +134,12 @@ const styles = StyleSheet.create({
   editText: { color: '#FFF', fontFamily: fonts.displayExtra, fontSize: 15 },
   signout: { backgroundColor: colors.dangerBg, borderRadius: radius.lg, minHeight: 52, alignItems: 'center', justifyContent: 'center' },
   signoutText: { color: colors.danger, fontFamily: fonts.displayExtra, fontSize: 14 },
+  actTitle: { fontSize: 16, fontFamily: fonts.displayExtra, color: colors.text },
+  actSub: { fontSize: 12, fontFamily: fonts.body, color: colors.muted, marginTop: 2, marginBottom: 6 },
+  actRow: { flexDirection: 'row', gap: 10, paddingVertical: 8, borderTopWidth: 1, borderTopColor: colors.border },
+  actMid: { flex: 1 },
+  actAction: { fontSize: 13, fontFamily: fonts.display, color: colors.text },
+  actMeta: { fontSize: 12, fontFamily: fonts.body, color: colors.muted, marginTop: 2 },
+  actTime: { fontSize: 10, fontFamily: fonts.body, color: colors.placeholder, fontVariant: ['tabular-nums'] },
   ver: { textAlign: 'center', color: colors.placeholder, fontSize: 12, fontFamily: fonts.body, marginTop: 4 },
 });

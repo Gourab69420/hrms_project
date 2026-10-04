@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
@@ -79,6 +80,13 @@ export default function Tickets() {
               <StatusPill status={t.status === 'open' ? 'Pending' : t.status === 'closed' ? 'Approved' : 'On Leave'} />
             </View>
             <View style={styles.actions}>
+              {/payslip|payroll|salary/i.test(t.category) && (
+                <Pressable
+                  style={styles.payroll}
+                  onPress={() => router.push(`/(admin)/payroll/employee/${t.employee_id}` as never)}>
+                  <Text style={styles.payrollText}>→ {`EMP-${t.employee_id}`} payroll</Text>
+                </Pressable>
+              )}
               {(NEXT[t.status] ?? []).map((n) => (
                 <Pressable key={n} style={styles.act} onPress={() => advance(t.id, n)}>
                   <Text style={styles.actText}>→ {n.replace('_', ' ')}</Text>
@@ -110,7 +118,9 @@ const styles = StyleSheet.create({
   subject: { fontSize: 14, fontFamily: fonts.display, color: colors.text },
   meta: { fontSize: 11, fontFamily: fonts.body, color: colors.muted, marginTop: 2 },
   body2: { fontSize: 13, fontFamily: fonts.body, color: colors.text, marginTop: 6 },
-  actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8 },
+  actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, alignItems: 'center', flexWrap: 'wrap' },
+  payroll: { backgroundColor: colors.navy, borderRadius: radius.sm, paddingHorizontal: 12, paddingVertical: 8 },
+  payrollText: { color: '#FFF', fontFamily: fonts.display, fontSize: 12 },
   act: { backgroundColor: colors.royalSoft, borderRadius: radius.sm, paddingHorizontal: 12, paddingVertical: 8 },
   actText: { color: colors.navy, fontFamily: fonts.display, fontSize: 12, textTransform: 'capitalize' },
   muted: { color: colors.muted, fontFamily: fonts.body, textAlign: 'center' },

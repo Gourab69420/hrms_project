@@ -393,7 +393,10 @@ export function useLeaveAction() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['leaves-all'] });
       qc.invalidateQueries({ queryKey: ['leaves-my'] });
+      qc.invalidateQueries({ queryKey: ['leaves-team'] });
+      qc.invalidateQueries({ queryKey: ['regs-pending-count'] });
       qc.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      qc.invalidateQueries({ queryKey: ['inbox'] });
     },
   });
 }
@@ -472,7 +475,21 @@ export function useBalancesMine() {
 
 export function useHolidays() {
   const q = useQuery({ queryKey: ['holidays'], queryFn: () => import('./api').then((m) => m.getHolidays()) });
-  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
+  const s = useQuery({
+    queryKey: ['holidays-status'],
+    queryFn: () => import('./api').then((m) => m.getExternalStatus()),
+    staleTime: 60_000,
+  });
+  return {
+    data: q.data ?? [],
+    status: s.data ?? null,
+    isLoading: q.isLoading,
+    error: q.error ? qError(q.error) : null,
+    refetch: () => {
+      q.refetch();
+      s.refetch();
+    },
+  };
 }
 
 export function useAnnouncements() {
@@ -496,11 +513,6 @@ export function usePolls() {
 
 export function useMyRegs() {
   const q = useQuery({ queryKey: ['regs-my'], queryFn: () => import('./api').then((m) => m.getMyRegs()) });
-  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
-}
-
-export function useMyLoans() {
-  const q = useQuery({ queryKey: ['loans-my'], queryFn: () => import('./api').then((m) => m.getMyLoans()) });
   return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
 }
 
@@ -544,4 +556,23 @@ export function useInbox() {
     error: q.error ? qError(q.error) : null,
     refetch: q.refetch,
   };
+}
+
+/** Pending-only regularization count (backend counts pending; invalidated on every decision). */
+export function useRegPending() {
+  const q = useQuery({
+    queryKey: ['regs-pending-count'],
+    queryFn: () => import('./api').then((m) => m.getRegPendingCount()),
+  });
+  return { pending: q.data ?? 0, isLoading: q.isLoading, refetch: q.refetch };
+}
+
+export function useTeam() {
+  const q = useQuery({ queryKey: ['team'], queryFn: () => import('./api').then((m) => m.getTeam()) });
+  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
+}
+
+export function useMyActivities() {
+  const q = useQuery({ queryKey: ['audit-mine'], queryFn: () => import('./api').then((m) => m.getAudit(0, true)) });
+  return { data: q.data ?? [], isLoading: q.isLoading, error: q.error ? qError(q.error) : null, refetch: q.refetch };
 }

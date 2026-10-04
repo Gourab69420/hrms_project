@@ -83,6 +83,7 @@ class AttendanceCreate(BaseModel):
 
 class AttendanceOut(AttendanceCreate):
     id: int
+    work_hours: Optional[float] = None
     class Config:
         from_attributes = True
 
@@ -165,6 +166,7 @@ class HolidayCreate(BaseModel):
 
 class HolidayOut(HolidayCreate):
     id: int
+    source: str = "local"
     class Config:
         from_attributes = True
 

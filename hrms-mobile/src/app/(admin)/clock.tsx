@@ -4,7 +4,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { AppBar, Avatar, Card, Screen, SearchBar, StatusPill } from '../../components/ui';
+import {AppBar, Avatar, Card, Screen, SearchBar, StatusPill, initialsOf, toneFor} from '../../components/ui';
 import { api, listAllAttendance, listEmployees } from '../../services/api';
 import { qError, useDepartments } from '../../services/useHrms';
 import {colors, radius, fonts} from '../../theme';
@@ -17,6 +17,7 @@ export default function Clock() {
   const [q, setQ] = useState('');
   const [exporting, setExporting] = useState(false);
   const [alerting, setAlerting] = useState(false);
+  const [closing, setClosing] = useState(false);
   const { data: depts } = useDepartments();
   const empQ = useQuery({ queryKey: ['employees'], queryFn: () => listEmployees() });
   const attQ = useQuery({ queryKey: ['attendance-all'], queryFn: listAllAttendance });
@@ -127,7 +128,7 @@ export default function Clock() {
                 : '— not punched —';
           return (
             <Card key={e.id} style={styles.row}>
-              <Avatar initials={`${e.first_name[0] ?? ''}${e.last_name[0] ?? ''}`.toUpperCase()} tone={i} />
+              <Avatar initials={initialsOf(`${e.first_name} ${e.last_name}`)} tone={i} />
               <View style={styles.rowMid}>
                 <Text style={styles.rowName}>
                   {e.first_name} {e.last_name}
@@ -180,6 +181,29 @@ export default function Clock() {
               }
             }}>
             <Text style={styles.exportBtnText}>{alerting ? '…' : 'Send 🔔'}</Text>
+          </Pressable>
+        </Card>
+
+        <Card style={styles.export}>
+          <View>
+            <Text style={styles.exportTitle}>Close Ended Shifts</Text>
+            <Text style={styles.exportSub}>Auto punch-out everyone past shift end (no duplicates)</Text>
+          </View>
+          <Pressable
+            style={styles.exportBtn}
+            disabled={closing}
+            onPress={async () => {
+              setClosing(true);
+              try {
+                const r = await api.post('/attendance/auto-punch-out');
+                Alert.alert('Done', `Closed ${r.data.closed} open session(s).`);
+              } catch (e) {
+                Alert.alert('Failed', e instanceof Error ? e.message : 'Try again');
+              } finally {
+                setClosing(false);
+              }
+            }}>
+            <Text style={styles.exportBtnText}>{closing ? '…' : 'Run 🌙'}</Text>
           </Pressable>
         </Card>
         <View style={{ height: 24 }} />

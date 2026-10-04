@@ -14,18 +14,27 @@ import {
   View,
 } from 'react-native';
 import { AppBar, Card, Screen } from '../../components/ui';
-import { createHoliday, deleteHoliday, getHolidays } from '../../services/api';
-import { qError } from '../../services/useHrms';
+import { createHoliday, deleteHoliday, syncHolidays } from '../../services/api';
+import { qError, useHolidays } from '../../services/useHrms';
 import { colors, fonts, radius } from '../../theme';
 
-/** Admin holiday calendar — add (date picker) / remove. Blocks leave math via balances view. */
+/**
+ * Admin Holidays — Google Sheet (AppSheet) is the source of truth.
+ * Sheet rows show an "official sheet" badge; Sync imports them locally for offline fallback.
+ * Yearly Paid Quota lives here (admin-only, never in Shifts/employee UI).
+ */
 export default function Holidays() {
   const qc = useQueryClient();
-  const q = useQuery({ queryKey: ['holidays'], queryFn: getHolidays });
+  const { data, status, isLoading, error, refetch } = useHolidays();
+  const ltQ = useQuery({
+    queryKey: ['leave-types'],
+    queryFn: () => import('../../services/api').then((m) => m.getLeaveTypes()),
+  });
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   const add = async () => {
     if (!name.trim()) {
@@ -41,6 +50,19 @@ export default function Holidays() {
       Alert.alert('Failed', e instanceof Error ? e.message : 'Try again');
     } finally {
       setBusy(false);
+    }
+  };
+
+  const sync = async () => {
+    setSyncing(true);
+    try {
+      const r = await syncHolidays();
+      qc.invalidateQueries({ queryKey: ['holidays'] });
+      Alert.alert('Synced', `Imported ${r.added}, updated ${r.updated} from the official sheet.`);
+    } catch (e) {
+      Alert.alert('Sync failed', e instanceof Error ? e.message : 'Try again');
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -69,8 +91,27 @@ export default function Holidays() {
       </View>
       <ScrollView
         contentContainerStyle={styles.body}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={() => q.refetch()} />}>
+        refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} />}>
+        <Card style={styles.src}>
+          <View style={styles.srcMid}>
+            <Text style={styles.srcTitle}>
+              {status?.configured ? '📗 Official Google Sheet connected' : '📕 Sheet not connected'}
+            </Text>
+            <Text style={styles.srcSub}>
+              {status?.configured
+                ? 'Holiday list below comes straight from the sheet.'
+                : 'Set APPSHEET_APP_ID + APPSHEET_APP_KEY on the backend — showing local entries for now.'}
+            </Text>
+          </View>
+          {status?.configured && (
+            <Pressable style={styles.sync} onPress={sync} disabled={syncing}>
+              <Text style={styles.syncText}>{syncing ? '…' : 'Sync ⤓'}</Text>
+            </Pressable>
+          )}
+        </Card>
+
         <Card style={styles.form}>
+          <Text style={styles.h}>Custom local holiday</Text>
           <Pressable style={styles.input} onPress={() => setShow(true)}>
             <Text style={styles.inputText}>📅  {date.toDateString()}</Text>
           </Pressable>
@@ -97,28 +138,50 @@ export default function Holidays() {
           </Pressable>
         </Card>
 
-        {q.isLoading && <ActivityIndicator color={colors.navy} />}
-        {q.error && (
+        {isLoading && <ActivityIndicator color={colors.navy} />}
+        {error && (
           <Card>
-            <Text style={styles.err}>{qError(q.error)}</Text>
+            <Text style={styles.err}>{error}</Text>
           </Card>
         )}
-        {(q.data ?? []).map((h) => (
-          <Card key={h.id} style={styles.row}>
+        {data.map((h) => (
+          <Card key={`${h.source}-${h.id}-${h.date}`} style={styles.row}>
             <View style={styles.mid}>
               <Text style={styles.name}>{h.name}</Text>
               <Text style={styles.date}>{h.date}</Text>
+              {!!h.description && <Text style={styles.desc}>{h.description}</Text>}
             </View>
-            <Pressable onPress={() => remove(h.id, h.name)}>
-              <Text style={styles.del}>Delete</Text>
-            </Pressable>
+            <View style={{ alignItems: 'flex-end', gap: 6 }}>
+              <View style={[styles.badge, h.source === 'appsheet' && styles.badgeSheet]}>
+                <Text style={[styles.badgeText, h.source === 'appsheet' && styles.badgeTextSheet]}>
+                  {h.source === 'appsheet' ? 'official sheet' : 'local'}
+                </Text>
+              </View>
+              {h.id > 0 && (
+                <Pressable onPress={() => remove(h.id, h.name)}>
+                  <Text style={styles.del}>Delete</Text>
+                </Pressable>
+              )}
+            </View>
           </Card>
         ))}
-        {!q.isLoading && (q.data ?? []).length === 0 && (
+        {!isLoading && data.length === 0 && (
           <Card>
             <Text style={styles.muted}>No holidays yet.</Text>
           </Card>
         )}
+
+        <Text style={styles.h}>Yearly Paid Quota (admin only)</Text>
+        {(ltQ.data ?? []).map((t) => (
+          <Card key={t.id} style={styles.row}>
+            <View style={styles.mid}>
+              <Text style={styles.name}>{t.name}</Text>
+              <Text style={styles.date}>
+                {t.yearly_quota}/yr • {t.paid ? 'paid' : 'unpaid'}
+              </Text>
+            </View>
+          </Card>
+        ))}
       </ScrollView>
     </Screen>
   );
@@ -126,7 +189,14 @@ export default function Holidays() {
 
 const styles = StyleSheet.create({
   body: { paddingHorizontal: 16, gap: 10, paddingBottom: 24 },
+  src: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  srcMid: { flex: 1 },
+  srcTitle: { fontSize: 13, fontFamily: fonts.display, color: colors.text },
+  srcSub: { fontSize: 12, fontFamily: fonts.body, color: colors.muted, marginTop: 3 },
+  sync: { backgroundColor: colors.navy, borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 10 },
+  syncText: { color: '#FFF', fontFamily: fonts.display, fontSize: 13 },
   form: { gap: 10 },
+  h: { fontSize: 15, fontFamily: fonts.display, color: colors.text, marginTop: 4 },
   input: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, minHeight: 48, justifyContent: 'center', paddingHorizontal: 14 },
   inputText: { fontSize: 14, fontFamily: fonts.body, color: colors.text },
   input2: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, minHeight: 48, paddingHorizontal: 14, fontSize: 14, fontFamily: fonts.body, color: colors.text, backgroundColor: '#FFF' },
@@ -136,7 +206,12 @@ const styles = StyleSheet.create({
   mid: { flex: 1 },
   name: { fontSize: 14, fontFamily: fonts.display, color: colors.text },
   date: { fontSize: 12, fontFamily: fonts.body, color: colors.muted, marginTop: 2, fontVariant: ['tabular-nums'] },
+  desc: { fontSize: 12, fontFamily: fonts.body, color: colors.muted, marginTop: 2 },
   del: { color: colors.dangerDot, fontFamily: fonts.display, fontSize: 13 },
+  badge: { backgroundColor: colors.royalSoft, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
+  badgeSheet: { backgroundColor: colors.successBg },
+  badgeText: { fontSize: 10, fontFamily: fonts.display, color: colors.royal },
+  badgeTextSheet: { color: colors.success },
   muted: { color: colors.muted, fontFamily: fonts.body, textAlign: 'center' },
   err: { color: colors.dangerDot, fontFamily: fonts.body },
 });

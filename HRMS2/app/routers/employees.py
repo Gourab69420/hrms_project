@@ -7,6 +7,7 @@ from app import models, schemas
 from app.audit import log
 from app.auth import get_current_user, require_roles
 from app.models import RoleEnum
+from app.permissions import report_ids
 
 router = APIRouter(prefix="/employees", tags=["Employees"])
 hr_admin = require_roles(RoleEnum.admin, RoleEnum.hr)
@@ -52,6 +53,18 @@ def get_my_employee(
     if not emp:
         raise HTTPException(status_code=404, detail="Employee not found")
     return emp
+
+
+@router.get("/team", response_model=List[schemas.EmployeeOut])
+def my_team(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Direct reports of the logged-in employee (their actual team members)."""
+    ids = report_ids(db, current_user)
+    if not ids:
+        return []
+    return db.query(models.Employee).filter(models.Employee.id.in_(ids)).order_by(models.Employee.id).all()
 
 
 @router.get("/{emp_id}", response_model=schemas.EmployeeOut)

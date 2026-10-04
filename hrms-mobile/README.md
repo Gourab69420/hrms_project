@@ -39,17 +39,20 @@ npx expo start             # scan with Expo Go (same Wi-Fi)
 
 **Entry:** role chooser `/`, `/admin-login`, `/employee-login`.
 
-**Admin tabs** — Dashboard (+Manage grid), Staff, Clock, Leaves, Payroll.
-Hidden routes: `staff/add`, `staff/[id]` (call/email/deactivate/documents),
-`payroll/run`, `approvals`, `regs`, `tickets`, `exits`, `holidays`, `announcements`,
-`audit` (admin-only), `comp` (loans + salary), `shifts`, `leave-types`.
+**Admin tabs** — Dashboard (+Manage grid), Staff, Clock (roster, CSV export, absentee
+alerts, auto close), Leaves, Payroll.
+Hidden routes: `staff/add`, `staff/[id]` (call/email/edit/deactivate/full-wipe/documents),
+`staff/edit/[id]`, `payroll/run`, `payroll/employee/[id]` (per-employee payroll from tickets),
+`approvals`, `regs` (pending-count badge), `tickets`, `exits`, `holidays` (sheet sync + quotas),
+`announcements`, `departments`, `comp` (salary structure), `shifts`, `profile`
+(info, self-edit, My Activities, sign-out).
 
-**Employee tabs** — Home (+Services grid), Attendance (one-button punch), Leaves
-(balances + withdraw), Payroll (statutory breakdown + PDF payslip), Profile
-(live data, sign-out, app-lock toggle).
-Hidden routes: `apply-leave` (real date pickers, quota-aware types), `announcements`
-(+poll voting), `holidays`, `regularization`, `loans`, `tickets`, `exit`, `documents`,
-`team` (manager approvals for direct reports).
+**Employee tabs** — Home (+Services grid), Attendance (one-button punch, offline-safe),
+Leaves (balances + withdraw), Payroll (statutory breakdown + PDF payslip), Profile
+(live data, sign-out, app-lock toggle). Hidden routes: `apply-leave` (real date pickers,
+quota-aware types), `announcements` (+poll voting), `holidays` (official-sheet badges),
+`regularization`, `tickets`, `exit`, `documents`, `team` (my direct reports — approvals
+live in the Admin app only).
 
 ## Environment
 

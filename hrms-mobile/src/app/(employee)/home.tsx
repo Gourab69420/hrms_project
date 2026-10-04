@@ -112,7 +112,6 @@ export default function EmpHome() {
               { icon: 'megaphone-outline', label: 'Notices', to: '/(employee)/announcements' },
               { icon: 'calendar-outline', label: 'Holidays', to: '/(employee)/holidays' },
               { icon: 'time-outline', label: 'Missed punch', to: '/(employee)/regularization' },
-              { icon: 'cash-outline', label: 'Loans', to: '/(employee)/loans' },
               { icon: 'ticket-outline', label: 'Helpdesk', to: '/(employee)/tickets' },
               { icon: 'exit-outline', label: 'Exit', to: '/(employee)/exit' },
               { icon: 'folder-outline', label: 'Documents', to: '/(employee)/documents' },

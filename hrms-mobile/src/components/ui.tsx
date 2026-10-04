@@ -87,12 +87,30 @@ export function StatusPill({ status }: { status: string }) {
   );
 }
 
-export function Avatar({ initials, tone = 0 }: { initials: string; tone?: number }) {
+/** Standard initials: first letters of first two words, uppercased. Empty name -> "?" fallback. */
+export function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
+
+/** Stable color slot per id so the same employee always gets the same avatar. */
+export function toneFor(id: number): number {
+  return Math.abs(id) % 5;
+}
+
+export function Avatar({ initials, tone = 0, size = 52 }: { initials: string; tone?: number; size?: number }) {
   const bgs = ['#1E3A8A', '#2563EB', '#0F172A', '#DBEAFE', '#EFF6FF'];
   const fgs = ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#1E3A8A', '#1E3A8A'];
+  const label = initials.trim() || '?';
   return (
-    <View style={[styles.avatar, { backgroundColor: bgs[tone % bgs.length] }]}>
-      <Text style={[styles.avatarText, { color: fgs[tone % fgs.length] }]}>{initials}</Text>
+    <View
+      style={[
+        styles.avatar,
+        { backgroundColor: bgs[tone % bgs.length], width: size, height: size, borderRadius: size / 2 },
+      ]}>
+      <Text style={[styles.avatarText, { color: fgs[tone % fgs.length], fontSize: size * 0.35 }]}>{label}</Text>
     </View>
   );
 }
