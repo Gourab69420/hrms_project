@@ -102,6 +102,23 @@ def download_template(_=Depends(get_current_user)):
     })
 
 
+def _decode_csv(raw: bytes) -> tuple[str, str]:
+    """Excel/phone-saved CSVs are rarely clean UTF-8. Try BOM/encodings in order."""
+    if raw.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return raw.decode("utf-16"), "utf-16"
+    if b"\x00" in raw:
+        try:
+            return raw.decode("utf-16"), "utf-16"
+        except Exception:
+            pass
+    for enc in ("utf-8-sig", "utf-8", "cp1252"):
+        try:
+            return raw.decode(enc), enc
+        except Exception:
+            continue
+    return raw.decode("latin-1"), "latin-1"
+
+
 @router.post("/upload", dependencies=[Depends(hr_admin)])
 def upload_csv(
     file: UploadFile = File(...),
@@ -112,18 +129,31 @@ def upload_csv(
     Re-uploading replaces the previous set — old rows are removed.
     Expected headers (flexible): Date, Name, Reason, Type, Year."""
     raw = file.file.read()
+    if not raw or not raw.strip():
+        raise HTTPException(status_code=400, detail="File is empty — download the template first")
+    if len(raw) > 2 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large (max 2 MB)")
+    text, encoding = _decode_csv(raw)
     try:
-        text = raw.decode("utf-8-sig")
+        reader = csv.DictReader(io.StringIO(text), skipinitialspace=True)
+        if not reader.fieldnames:
+            raise ValueError("no header row")
+        # Normalize headers: stray BOM/whitespace/quotes from spreadsheet exports
+        reader.fieldnames = [h.strip().strip('"').strip("'").lstrip("﻿") for h in reader.fieldnames]
     except Exception:
-        raise HTTPException(status_code=400, detail="File must be UTF-8 CSV")
-    reader = csv.DictReader(io.StringIO(text))
-    if not reader.fieldnames:
-        raise HTTPException(status_code=400, detail="Empty CSV — download the template first")
-    rows = [r for r in (appsheet.normalize(dict(row)) for row in reader) if r]
+        raise HTTPException(status_code=400, detail="Could not read CSV headers — download the template first")
+    rows, bad = [], 0
+    for record in reader:
+        clean = {(k.strip() if k else ""): (v.strip() if isinstance(v, str) else v) for k, v in record.items()}
+        norm = appsheet.normalize(clean)
+        if norm:
+            rows.append(norm)
+        elif any((v or "").strip() for v in clean.values()):
+            bad += 1
     if not rows:
         raise HTTPException(
             status_code=400,
-            detail="No valid rows found. Need Date + Name columns (YYYY-MM-DD).",
+            detail=f"No valid rows (columns seen: {', '.join(reader.fieldnames)}). Need Date (YYYY-MM-DD) + Name.",
         )
     # De-duplicate inside the file (last row wins per date)
     by_date: dict[str, dict] = {}
@@ -136,7 +166,7 @@ def upload_csv(
             date=_date.fromisoformat(r["date"]), name=r["name"], description=r["description"],
         ))
     log(db, "holiday.upload_replace", "holiday", None, current_user.id,
-        f"file={file.filename} replaced_with={len(by_date)} skipped={len(rows) - len(by_date)}")
+        f"file={file.filename} enc={encoding} replaced_with={len(by_date)} skipped_invalid={bad}")
     db.commit()
     appsheet.clear_cache()
     return {"replaced_with": len(by_date), "source": "csv_upload"}
