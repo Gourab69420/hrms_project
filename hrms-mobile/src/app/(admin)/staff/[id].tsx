@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native';
 import {AppBar, Avatar, Card, Screen, StatusPill, initialsOf, toneFor} from '../../../components/ui';
-import { api, downloadDocUrl, getMyDocs, type Doc } from '../../../services/api';
+import { api, downloadDocUrl, getMyDocs, toApiError, type Doc } from '../../../services/api';
 import { useAuth } from '../../../store/AuthContext';
 import { useEmployee } from '../../../services/useHrms';
 import {colors, radius, fonts} from '../../../theme';
@@ -234,12 +234,11 @@ function DocumentsSection({ empId }: { empId: number }) {
         name: asset.name ?? 'document.pdf',
         type: asset.mimeType ?? 'application/pdf',
       } as never);
-      await api.post(`/documents/employee/${empId}?doc_type=${encodeURIComponent(docType)}`, form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      // NOTE: no manual Content-Type — axios adds the multipart boundary itself.
+      await api.post(`/documents/employee/${empId}?doc_type=${encodeURIComponent(docType)}`, form);
       await load();
     } catch (e) {
-      Alert.alert('Upload failed', e instanceof Error ? e.message : 'Try again');
+      Alert.alert('Upload failed', toApiError(e).message);
     } finally {
       setBusy(false);
     }

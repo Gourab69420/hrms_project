@@ -18,7 +18,7 @@ import {
   View,
 } from 'react-native';
 import { AppBar, Card, Screen } from '../../components/ui';
-import { API_URL, api, createHoliday, deleteHoliday, loadToken, syncHolidays } from '../../services/api';
+import { API_URL, api, createHoliday, deleteHoliday, loadToken, syncHolidays, toApiError } from '../../services/api';
 import { qError, useHolidays } from '../../services/useHrms';
 import { colors, fonts, radius } from '../../theme';
 
@@ -108,13 +108,12 @@ export default function Holidays() {
                 name: asset.name ?? 'holidays.csv',
                 type: asset.mimeType ?? 'text/csv',
               } as never);
-              const res = await api.post('/holidays/upload', form, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-              });
+              // NOTE: no manual Content-Type — axios adds the multipart boundary itself.
+              const res = await api.post('/holidays/upload', form);
               qc.invalidateQueries({ queryKey: ['holidays'] });
               Alert.alert('Replaced', `Holiday set replaced with ${res.data.replaced_with} entries.`);
             } catch (e) {
-              Alert.alert('Upload failed', e instanceof Error ? e.message : 'Try again');
+              Alert.alert('Upload failed', toApiError(e).message);
             } finally {
               setUploading(false);
             }
