@@ -2,6 +2,8 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { API_URL } from './config';
 
+export { API_URL };
+
 export const TOKEN_KEY = 'hrms_jwt';
 const REFRESH_KEY = 'hrms_refresh';
 

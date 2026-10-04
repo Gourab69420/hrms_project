@@ -1,4 +1,7 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
@@ -14,7 +17,7 @@ import {
   View,
 } from 'react-native';
 import { AppBar, Card, Screen } from '../../components/ui';
-import { createHoliday, deleteHoliday, syncHolidays } from '../../services/api';
+import { API_URL, api, createHoliday, deleteHoliday, loadToken, syncHolidays } from '../../services/api';
 import { qError, useHolidays } from '../../services/useHrms';
 import { colors, fonts, radius } from '../../theme';
 
@@ -35,6 +38,7 @@ export default function Holidays() {
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const add = async () => {
     if (!name.trim()) {
@@ -64,6 +68,59 @@ export default function Holidays() {
     } finally {
       setSyncing(false);
     }
+  };
+
+  const downloadTemplate = async () => {
+    try {
+      const target = `${FileSystem.cacheDirectory ?? FileSystem.documentDirectory}holidays_template.csv`;
+      const dl = await FileSystem.downloadAsync(`${API_URL}/holidays/template`, target, {
+        headers: { Authorization: `Bearer ${(await loadToken()) ?? ''}` },
+      });
+      if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(dl.uri);
+      else Alert.alert('Saved', dl.uri);
+    } catch (e) {
+      Alert.alert('Failed', e instanceof Error ? e.message : 'Try again');
+    }
+  };
+
+  const uploadCsv = async () => {
+    const picked = await DocumentPicker.getDocumentAsync({
+      type: ['text/csv', 'text/comma-separated-values', 'application/vnd.ms-excel'],
+      copyToCacheDirectory: true,
+    });
+    if (picked.canceled) return;
+    const asset = picked.assets[0];
+    Alert.alert(
+      'Replace holidays?',
+      'Uploading replaces the ENTIRE holiday set with this file. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Replace',
+          style: 'destructive',
+          onPress: async () => {
+            setUploading(true);
+            try {
+              const form = new FormData();
+              form.append('file', {
+                uri: asset.uri,
+                name: asset.name ?? 'holidays.csv',
+                type: asset.mimeType ?? 'text/csv',
+              } as never);
+              const res = await api.post('/holidays/upload', form, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+              });
+              qc.invalidateQueries({ queryKey: ['holidays'] });
+              Alert.alert('Replaced', `Holiday set replaced with ${res.data.replaced_with} entries.`);
+            } catch (e) {
+              Alert.alert('Upload failed', e instanceof Error ? e.message : 'Try again');
+            } finally {
+              setUploading(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const remove = (id: number, label: string) => {
@@ -108,6 +165,21 @@ export default function Holidays() {
               <Text style={styles.syncText}>{syncing ? '…' : 'Sync ⤓'}</Text>
             </Pressable>
           )}
+        </Card>
+
+        <Card style={styles.form}>
+          <Text style={styles.h}>Set holidays from file (replaces the whole set)</Text>
+          <View style={styles.csvRow}>
+            <Pressable style={styles.csvBtn} onPress={downloadTemplate}>
+              <Text style={styles.csvText}>⤓ Template</Text>
+            </Pressable>
+            <Pressable style={[styles.csvBtn, styles.csvPrimary]} onPress={uploadCsv} disabled={uploading}>
+              <Text style={[styles.csvText, { color: '#FFF' }]}>
+                {uploading ? 'Uploading…' : '⤒ Upload CSV'}
+              </Text>
+            </Pressable>
+          </View>
+          <Text style={styles.csvHint}>Columns: Date (YYYY-MM-DD), Name, Reason, Type, Year</Text>
         </Card>
 
         <Card style={styles.form}>
@@ -196,6 +268,14 @@ const styles = StyleSheet.create({
   sync: { backgroundColor: colors.navy, borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 10 },
   syncText: { color: '#FFF', fontFamily: fonts.display, fontSize: 13 },
   form: { gap: 10 },
+  csvRow: { flexDirection: 'row', gap: 10 },
+  csvBtn: {
+    flex: 1, borderWidth: 1, borderColor: colors.navy, borderRadius: radius.md,
+    minHeight: 46, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF',
+  },
+  csvPrimary: { backgroundColor: colors.navy },
+  csvText: { color: colors.navy, fontFamily: fonts.display, fontSize: 13 },
+  csvHint: { fontSize: 11, fontFamily: fonts.body, color: colors.muted },
   h: { fontSize: 15, fontFamily: fonts.display, color: colors.text, marginTop: 4 },
   input: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, minHeight: 48, justifyContent: 'center', paddingHorizontal: 14 },
   inputText: { fontSize: 14, fontFamily: fonts.body, color: colors.text },

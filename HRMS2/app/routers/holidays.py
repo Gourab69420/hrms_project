@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 from typing import List
+import csv
+import io
 
 from app import appsheet
 from app.database import get_db
@@ -86,6 +89,57 @@ def sync_from_sheet(
     db.commit()
     appsheet.clear_cache()
     return {"added": added, "updated": updated, "source": "appsheet"}
+
+
+TEMPLATE = "Date,Name,Reason,Type,Year\r\n2026-01-26,Republic Day,National holiday,National,2026\r\n"
+
+
+@router.get("/template", response_class=PlainTextResponse)
+def download_template(_=Depends(get_current_user)):
+    """Blank CSV template (with one example row) for the admin upload."""
+    return PlainTextResponse(TEMPLATE, media_type="text/csv", headers={
+        "Content-Disposition": 'attachment; filename="holidays_template.csv"',
+    })
+
+
+@router.post("/upload", dependencies=[Depends(hr_admin)])
+def upload_csv(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Replace the ENTIRE local holiday set with the uploaded CSV.
+    Re-uploading replaces the previous set — old rows are removed.
+    Expected headers (flexible): Date, Name, Reason, Type, Year."""
+    raw = file.file.read()
+    try:
+        text = raw.decode("utf-8-sig")
+    except Exception:
+        raise HTTPException(status_code=400, detail="File must be UTF-8 CSV")
+    reader = csv.DictReader(io.StringIO(text))
+    if not reader.fieldnames:
+        raise HTTPException(status_code=400, detail="Empty CSV — download the template first")
+    rows = [r for r in (appsheet.normalize(dict(row)) for row in reader) if r]
+    if not rows:
+        raise HTTPException(
+            status_code=400,
+            detail="No valid rows found. Need Date + Name columns (YYYY-MM-DD).",
+        )
+    # De-duplicate inside the file (last row wins per date)
+    by_date: dict[str, dict] = {}
+    for r in rows:
+        by_date[r["date"]] = r
+    from datetime import date as _date
+    db.query(models.Holiday).delete(synchronize_session=False)
+    for r in by_date.values():
+        db.add(models.Holiday(
+            date=_date.fromisoformat(r["date"]), name=r["name"], description=r["description"],
+        ))
+    log(db, "holiday.upload_replace", "holiday", None, current_user.id,
+        f"file={file.filename} replaced_with={len(by_date)} skipped={len(rows) - len(by_date)}")
+    db.commit()
+    appsheet.clear_cache()
+    return {"replaced_with": len(by_date), "source": "csv_upload"}
 
 
 @router.post("/", response_model=schemas.HolidayOut, status_code=201, dependencies=[Depends(hr_admin)])
