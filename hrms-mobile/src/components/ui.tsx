@@ -128,7 +128,7 @@ export function PrimaryButton({ label, onPress }: { label: string; onPress?: () 
 export function SearchBar({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <View style={styles.search}>
-      <Text style={styles.searchIcon}>⌕</Text>
+      <Ionicons name="search-outline" size={18} color={colors.muted} />
       <TextInput
         value={value}
         onChangeText={onChange}

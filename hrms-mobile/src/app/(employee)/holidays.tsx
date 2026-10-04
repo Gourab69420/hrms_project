@@ -26,7 +26,7 @@ export default function Holidays() {
         {upcoming.map((h) => (
           <Card key={`${h.source}-${h.id}-${h.date}`} style={styles.row}>
             <View style={styles.mid}>
-              <Text style={styles.name}>🎉 {h.name}</Text>
+              <Text style={styles.name}>{h.name}</Text>
               <Text style={styles.date}>{h.date}</Text>
             </View>
             {h.source === 'appsheet' && (

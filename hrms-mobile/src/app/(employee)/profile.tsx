@@ -117,12 +117,13 @@ export default function EmpProfile() {
         </Card>
 
         <Pressable
-          style={styles.signout}
+          style={styles.signoutWithIcon}
           onPress={async () => {
             await signOut();
             router.replace('/');
           }}>
-          <Text style={styles.signoutText}>⇥   Sign Out of Account</Text>
+          <Ionicons name="log-out-outline" size={18} color={colors.danger} />
+          <Text style={styles.signoutText}>Sign Out of Account</Text>
         </Pressable>
         {canLock && (
           <Card style={styles.lockRow}>
@@ -155,6 +156,7 @@ const styles = StyleSheet.create({
   fLbl: { fontSize: 12, color: colors.muted, fontFamily: fonts.body, },
   fVal: { fontSize: 14, fontFamily: fonts.display, color: colors.text, marginTop: 1 },
   signout: { backgroundColor: colors.dangerBg, borderRadius: radius.lg, minHeight: 52, alignItems: 'center', justifyContent: 'center' },
+  signoutWithIcon: { backgroundColor: colors.dangerBg, borderRadius: radius.lg, minHeight: 52, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 },
   signoutText: { color: colors.danger, fontFamily: fonts.displayExtra, fontSize: 14 },
   lockRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   lockMid: { flex: 1 },

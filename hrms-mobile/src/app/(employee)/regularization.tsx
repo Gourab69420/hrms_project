@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -79,7 +80,8 @@ export default function Regularization() {
         <Card style={styles.form}>
           <Text style={styles.h}>Missed a punch? Request a correction</Text>
           <Pressable style={styles.input} onPress={() => setShowDay(true)}>
-            <Text style={styles.inputText}>📅  {day.toDateString()}</Text>
+            <Text style={styles.inputText}>{day.toDateString()}</Text>
+            <Ionicons name="calendar-outline" size={16} color={colors.muted} />
           </Pressable>
           {showDay && (
             <DateTimePicker
@@ -101,8 +103,9 @@ export default function Regularization() {
           </View>
           <Pressable style={styles.input} onPress={() => setShowTime(true)}>
             <Text style={styles.inputText}>
-              🕘  {String(time.getHours()).padStart(2, '0')}:{String(time.getMinutes()).padStart(2, '0')}
+              {String(time.getHours()).padStart(2, '0')}:{String(time.getMinutes()).padStart(2, '0')}
             </Text>
+            <Ionicons name="time-outline" size={16} color={colors.muted} />
           </Pressable>
           {showTime && (
             <DateTimePicker

@@ -76,7 +76,10 @@ export default function AdminProfile() {
             await signOut();
             router.replace('/');
           }}>
-          <Text style={styles.signoutText}>⇥   Sign Out of Account</Text>
+          <View style={styles.signoutRow}>
+            <Ionicons name="log-out-outline" size={18} color={colors.danger} />
+            <Text style={styles.signoutText}>Sign Out of Account</Text>
+          </View>
         </Pressable>
 
         <Card>
@@ -133,6 +136,7 @@ const styles = StyleSheet.create({
   },
   editText: { color: '#FFF', fontFamily: fonts.displayExtra, fontSize: 15 },
   signout: { backgroundColor: colors.dangerBg, borderRadius: radius.lg, minHeight: 52, alignItems: 'center', justifyContent: 'center' },
+  signoutRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   signoutText: { color: colors.danger, fontFamily: fonts.displayExtra, fontSize: 14 },
   actTitle: { fontSize: 16, fontFamily: fonts.displayExtra, color: colors.text },
   actSub: { fontSize: 12, fontFamily: fonts.body, color: colors.muted, marginTop: 2, marginBottom: 6 },

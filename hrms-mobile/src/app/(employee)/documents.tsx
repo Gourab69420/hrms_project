@@ -10,6 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { AppBar, Card, Screen } from '../../components/ui';
 import { downloadDocUrl, loadToken } from '../../services/api';
 import { useMyDocs } from '../../services/useHrms';
@@ -49,7 +50,7 @@ export default function Documents() {
         {data.map((d) => (
           <Pressable key={d.id} onPress={() => open(d.file_name, d.id)}>
             <Card style={styles.row}>
-              <Text style={styles.icon}>📄</Text>
+              <Ionicons name="document-text-outline" size={24} color={colors.navy} />
               <View style={styles.mid}>
                 <Text style={styles.name}>{d.file_name}</Text>
                 <Text style={styles.meta}>

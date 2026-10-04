@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
@@ -99,7 +100,10 @@ export default function EmpPayroll() {
                 {pdfBusy ? (
                   <ActivityIndicator color={colors.navy} />
                 ) : (
-                  <Text style={styles.dlText}>⤓   Download Payslip PDF</Text>
+                  <View style={styles.dlRow}>
+                    <Ionicons name="download-outline" size={18} color={colors.navy} />
+                    <Text style={styles.dlText}>Download Payslip PDF</Text>
+                  </View>
                 )}
               </Pressable>
             </View>
@@ -164,6 +168,7 @@ const styles = StyleSheet.create({
   net: { color: '#FFF', fontSize: 36, fontFamily: fonts.displayExtra, fontVariant: ['tabular-nums'] },
   meta: { color: '#D3E4FE', fontSize: 12, fontFamily: fonts.body, },
   dl: { backgroundColor: '#FFF', borderRadius: 10, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
+  dlRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   dlText: { color: colors.navy, fontFamily: fonts.displayExtra, fontSize: 14 },
   breakTitle: { fontSize: 15, fontFamily: fonts.displayExtra, color: colors.text, marginBottom: 6 },
   formula: { backgroundColor: colors.royalSoft, borderRadius: 10, padding: 10, marginTop: 10 },

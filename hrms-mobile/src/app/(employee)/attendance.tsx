@@ -74,7 +74,7 @@ export default function EmpAttendance() {
 
         <Card>
           <View style={styles.liveTop}>
-            <Text style={styles.liveDot}>{todays ? (punchedIn ? '🟢  PUNCHED IN' : '✅  DAY COMPLETE') : '⚪  NOT PUNCHED IN'}</Text>
+            <View style={styles.liveRow}><View style={[styles.liveDot, { backgroundColor: !todays ? '#CBD5E1' : punchedIn ? '#10B981' : '#2563EB' }]} /><Text style={styles.liveText}>{todays ? (punchedIn ? 'PUNCHED IN' : 'DAY COMPLETE') : 'NOT PUNCHED IN'}</Text></View>
             {todays && <StatusPill status={todays.status === 'late' ? 'Late' : 'Present'} />}
           </View>
           {todays && (
@@ -87,9 +87,16 @@ export default function EmpAttendance() {
             {punch.isPending ? (
               <ActivityIndicator color="#FFF" />
             ) : (
-              <Text style={styles.punchText}>
-                {!!todays && !!todays.check_out ? '✓  Done for today' : punchedIn ? '⇥  Punch Out' : '⇤  Punch In'}
-              </Text>
+              <View style={styles.punchRow}>
+                <Ionicons
+                  name={!!todays && !!todays.check_out ? 'checkmark-circle-outline' : punchedIn ? 'log-out-outline' : 'log-in-outline'}
+                  size={18}
+                  color="#FFF"
+                />
+                <Text style={styles.punchText}>
+                  {!!todays && !!todays.check_out ? 'Done for today' : punchedIn ? 'Punch Out' : 'Punch In'}
+                </Text>
+              </View>
             )}
           </Pressable>
           <Text style={styles.geo}>Tap once to mark attendance — check-in and check-out on the same button.</Text>
@@ -109,7 +116,10 @@ export default function EmpAttendance() {
         <View style={styles.logHead}>
           <Text style={styles.section}>Attendance Log</Text>
           <Pressable onPress={exportCsv} disabled={exporting}>
-            <Text style={styles.export}>{exporting ? '…' : 'Export Log ⤓'}</Text>
+            <View style={styles.exportRow}>
+              <Ionicons name="download-outline" size={14} color={colors.royal} />
+              <Text style={styles.export}>{exporting ? '…' : 'Export Log'}</Text>
+            </View>
           </Pressable>
         </View>
         {isLoading && <ActivityIndicator color={colors.navy} style={{ marginVertical: 16 }} />}
@@ -149,7 +159,11 @@ const styles = StyleSheet.create({
   eyebrow: { fontSize: 11, fontFamily: fonts.display, color: colors.muted, letterSpacing: 1 },
   date: { fontSize: 17, fontFamily: fonts.displayExtra, color: colors.text, marginTop: 2 },
   liveTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  liveDot: { fontFamily: fonts.displayExtra, fontSize: 13, color: colors.text },
+  liveRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  liveDot: { width: 10, height: 10, borderRadius: 5 },
+  liveText: { fontFamily: fonts.displayExtra, fontSize: 13, color: colors.text },
+  punchRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  exportRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   punched: { textAlign: 'center', color: colors.muted, fontSize: 13, marginTop: 8, fontFamily: fonts.body, },
   punchBtn: { backgroundColor: colors.navy, borderRadius: radius.sm, minHeight: 48, alignItems: 'center', justifyContent: 'center', marginTop: 12 },
   punchText: { color: '#FFF', fontFamily: fonts.displayExtra, fontSize: 15 },

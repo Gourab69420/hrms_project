@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
@@ -71,7 +72,7 @@ export default function ApplyLeave() {
           <Text style={styles.label}>Leave Type *</Text>
           <Pressable style={styles.input} onPress={() => setOpen((v) => !v)}>
             <Text style={styles.inputText}>{leaveType}</Text>
-            <Text style={styles.chev}>⌄</Text>
+            <Ionicons name="chevron-down" size={16} color={colors.muted} />
           </Pressable>
           {open &&
             typeNames.map((t) => (
@@ -91,14 +92,14 @@ export default function ApplyLeave() {
               <Text style={styles.label}>Start Date *</Text>
               <Pressable style={styles.input} onPress={() => setShowStart(true)}>
                 <Text style={styles.inputText}>{pretty(start)}</Text>
-                <Text>📅</Text>
+                <Ionicons name="calendar-outline" size={16} color={colors.muted} />
               </Pressable>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.label}>End Date *</Text>
               <Pressable style={styles.input} onPress={() => setShowEnd(true)}>
                 <Text style={styles.inputText}>{pretty(end)}</Text>
-                <Text>📅</Text>
+                <Ionicons name="calendar-outline" size={16} color={colors.muted} />
               </Pressable>
             </View>
           </View>
@@ -122,7 +123,10 @@ export default function ApplyLeave() {
           )}
 
           <View style={styles.dur}>
-            <Text style={styles.durL}>📅  Calculated Duration</Text>
+            <View style={styles.durLeft}>
+              <Ionicons name="calendar-outline" size={16} color={colors.muted} />
+              <Text style={styles.durL}>Calculated Duration</Text>
+            </View>
             <View style={styles.durPill}>
               <Text style={styles.durT}>
                 {days} Day{days === 1 ? '' : 's'}
@@ -168,6 +172,7 @@ const styles = StyleSheet.create({
   optText: { fontSize: 14, color: colors.text, textTransform: 'capitalize', fontFamily: fonts.body, },
   dates: { flexDirection: 'row', gap: 10 },
   dur: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.royalSoft, borderRadius: radius.lg, padding: 12 },
+  durLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   durL: { fontSize: 13, color: colors.muted, fontFamily: fonts.semiBold },
   durPill: { backgroundColor: '#FFF', borderRadius: 6, paddingHorizontal: 12, paddingVertical: 6 },
   durT: { color: colors.navy, fontFamily: fonts.displayExtra },

@@ -50,14 +50,14 @@ export default function Announcements() {
         {(ann.isLoading || polls.isLoading) && <ActivityIndicator color={colors.navy} style={{ marginTop: 16 }} />}
         {ann.data.map((a) => (
           <Card key={`a${a.id}`}>
-            <Text style={styles.title}>📢 {a.title}</Text>
+            <Text style={styles.title}>{a.title}</Text>
             <Text style={styles.msg}>{a.body}</Text>
             <Text style={styles.date}>{a.created_at.slice(0, 10)}</Text>
           </Card>
         ))}
         {polls.data.map((p) => (
           <Card key={`p${p.id}`}>
-            <Text style={styles.title}>📊 {p.question}</Text>
+            <Text style={styles.title}>{p.question}</Text>
             {p.options.map((o) => {
               const total = p.options.reduce((s, x) => s + x.votes, 0);
               const pct = total ? Math.round((o.votes / total) * 100) : 0;

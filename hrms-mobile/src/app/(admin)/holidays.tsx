@@ -1,4 +1,5 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
@@ -152,7 +153,7 @@ export default function Holidays() {
         <Card style={styles.src}>
           <View style={styles.srcMid}>
             <Text style={styles.srcTitle}>
-              {status?.configured ? '📗 Official Google Sheet connected' : '📕 Sheet not connected'}
+              {status?.configured ? 'Official Google Sheet connected' : 'Sheet not connected'}
             </Text>
             <Text style={styles.srcSub}>
               {status?.configured
@@ -162,7 +163,10 @@ export default function Holidays() {
           </View>
           {status?.configured && (
             <Pressable style={styles.sync} onPress={sync} disabled={syncing}>
-              <Text style={styles.syncText}>{syncing ? '…' : 'Sync ⤓'}</Text>
+              <View style={styles.btnRow}>
+                <Ionicons name="sync-outline" size={14} color="#FFF" />
+                <Text style={styles.syncText}>{syncing ? '…' : 'Sync'}</Text>
+              </View>
             </Pressable>
           )}
         </Card>
@@ -171,12 +175,18 @@ export default function Holidays() {
           <Text style={styles.h}>Set holidays from file (replaces the whole set)</Text>
           <View style={styles.csvRow}>
             <Pressable style={styles.csvBtn} onPress={downloadTemplate}>
-              <Text style={styles.csvText}>⤓ Template</Text>
+              <View style={styles.btnRow}>
+                <Ionicons name="download-outline" size={14} color={colors.navy} />
+                <Text style={styles.csvText}>Template</Text>
+              </View>
             </Pressable>
             <Pressable style={[styles.csvBtn, styles.csvPrimary]} onPress={uploadCsv} disabled={uploading}>
-              <Text style={[styles.csvText, { color: '#FFF' }]}>
-                {uploading ? 'Uploading…' : '⤒ Upload CSV'}
-              </Text>
+              <View style={styles.btnRow}>
+                <Ionicons name="cloud-upload-outline" size={14} color="#FFF" />
+                <Text style={[styles.csvText, { color: '#FFF' }]}>
+                  {uploading ? 'Uploading…' : 'Upload CSV'}
+                </Text>
+              </View>
             </Pressable>
           </View>
           <Text style={styles.csvHint}>Columns: Date (YYYY-MM-DD), Name, Reason, Type, Year</Text>
@@ -185,7 +195,7 @@ export default function Holidays() {
         <Card style={styles.form}>
           <Text style={styles.h}>Custom local holiday</Text>
           <Pressable style={styles.input} onPress={() => setShow(true)}>
-            <Text style={styles.inputText}>📅  {date.toDateString()}</Text>
+            <Text style={styles.inputText}>{date.toDateString()}</Text>
           </Pressable>
           {show && (
             <DateTimePicker
@@ -268,6 +278,7 @@ const styles = StyleSheet.create({
   sync: { backgroundColor: colors.navy, borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 10 },
   syncText: { color: '#FFF', fontFamily: fonts.display, fontSize: 13 },
   form: { gap: 10 },
+  btnRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   csvRow: { flexDirection: 'row', gap: 10 },
   csvBtn: {
     flex: 1, borderWidth: 1, borderColor: colors.navy, borderRadius: radius.md,

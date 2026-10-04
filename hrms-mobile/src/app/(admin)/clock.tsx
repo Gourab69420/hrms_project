@@ -149,19 +149,26 @@ export default function Clock() {
         )}
 
         <Card style={styles.export}>
-          <View>
-            <Text style={styles.exportTitle}>Export Roster & Logs</Text>
-            <Text style={styles.exportSub}>Download daily CSV • {total} records</Text>
+          <View style={styles.exportMid}>
+            <Text style={styles.exportTitle} numberOfLines={2}>Export Roster & Logs</Text>
+            <Text style={styles.exportSub} numberOfLines={2}>Download daily CSV • {total} records</Text>
           </View>
           <Pressable style={styles.exportBtn} onPress={exportCsv} disabled={exporting}>
-            <Text style={styles.exportBtnText}>{exporting ? '…' : 'Export ⤓'}</Text>
+            {exporting ? (
+              <ActivityIndicator size="small" color={colors.navy} />
+            ) : (
+              <>
+                <Ionicons name="download-outline" size={16} color={colors.navy} />
+                <Text style={styles.exportBtnText}>Export</Text>
+              </>
+            )}
           </Pressable>
         </Card>
 
         <Card style={styles.export}>
-          <View>
-            <Text style={styles.exportTitle}>Absentee Alerts</Text>
-            <Text style={styles.exportSub}>Notify managers of staff with no punch-in (after 10:30)</Text>
+          <View style={styles.exportMid}>
+            <Text style={styles.exportTitle} numberOfLines={2}>Absentee Alerts</Text>
+            <Text style={styles.exportSub} numberOfLines={2}>Notify managers of staff with no punch-in (after 10:30)</Text>
           </View>
           <Pressable
             style={styles.exportBtn}
@@ -180,14 +187,21 @@ export default function Clock() {
                 setAlerting(false);
               }
             }}>
-            <Text style={styles.exportBtnText}>{alerting ? '…' : 'Send 🔔'}</Text>
+            {alerting ? (
+              <ActivityIndicator size="small" color={colors.navy} />
+            ) : (
+              <>
+                <Ionicons name="notifications-outline" size={16} color={colors.navy} />
+                <Text style={styles.exportBtnText}>Send</Text>
+              </>
+            )}
           </Pressable>
         </Card>
 
         <Card style={styles.export}>
-          <View>
-            <Text style={styles.exportTitle}>Close Ended Shifts</Text>
-            <Text style={styles.exportSub}>Auto punch-out everyone past shift end (no duplicates)</Text>
+          <View style={styles.exportMid}>
+            <Text style={styles.exportTitle} numberOfLines={2}>Close Ended Shifts</Text>
+            <Text style={styles.exportSub} numberOfLines={2}>Auto punch-out everyone past shift end (no duplicates)</Text>
           </View>
           <Pressable
             style={styles.exportBtn}
@@ -203,7 +217,14 @@ export default function Clock() {
                 setClosing(false);
               }
             }}>
-            <Text style={styles.exportBtnText}>{closing ? '…' : 'Run 🌙'}</Text>
+            {closing ? (
+              <ActivityIndicator size="small" color={colors.navy} />
+            ) : (
+              <>
+                <Ionicons name="moon-outline" size={16} color={colors.navy} />
+                <Text style={styles.exportBtnText}>Run</Text>
+              </>
+            )}
           </Pressable>
         </Card>
         <View style={{ height: 24 }} />
@@ -235,9 +256,10 @@ const styles = StyleSheet.create({
   rowShift: { fontSize: 12, color: colors.text, marginTop: 3, fontVariant: ['tabular-nums'], fontFamily: fonts.body, },
   muted: { color: colors.muted, textAlign: 'center', fontFamily: fonts.body, },
   err: { color: colors.dangerDot, fontFamily: fonts.body, },
-  export: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  export: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  exportMid: { flex: 1, flexShrink: 1 },
   exportTitle: { fontSize: 14, fontFamily: fonts.display, color: colors.text },
   exportSub: { fontSize: 12, color: colors.muted, marginTop: 2, fontFamily: fonts.body, },
-  exportBtn: { backgroundColor: '#FFF', borderColor: colors.border, borderWidth: 1, borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 10 },
+  exportBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FFF', borderColor: colors.border, borderWidth: 1, borderRadius: radius.sm, paddingHorizontal: 14, paddingVertical: 10, flexShrink: 0 },
   exportBtnText: { color: colors.navy, fontFamily: fonts.display, fontSize: 13 },
 });

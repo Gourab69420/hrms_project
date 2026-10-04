@@ -263,8 +263,9 @@ function DocumentsSection({ empId }: { empId: number }) {
       <Text style={styles.docTitle}>Documents</Text>
       {docs.map((d) => (
         <Pressable key={d.id} style={styles.docRow} onPress={() => open(d)}>
+          <Ionicons name="document-text-outline" size={18} color={colors.navy} />
           <Text style={styles.docName}>
-            📄 {d.file_name} <Text style={styles.docMeta}>({d.doc_type})</Text>
+            {d.file_name} <Text style={styles.docMeta}>({d.doc_type})</Text>
           </Text>
         </Pressable>
       ))}
@@ -277,7 +278,10 @@ function DocumentsSection({ empId }: { empId: number }) {
         ))}
       </View>
       <Pressable style={styles.upload} onPress={upload} disabled={busy}>
-        <Text style={styles.uploadText}>{busy ? 'Uploading…' : '⤒ Upload document'}</Text>
+        <View style={styles.uploadRow}>
+          <Ionicons name="cloud-upload-outline" size={16} color={colors.navy} />
+          <Text style={styles.uploadText}>{busy ? 'Uploading…' : 'Upload document'}</Text>
+        </View>
       </Pressable>
     </Card>
   );
@@ -310,7 +314,7 @@ const styles = StyleSheet.create({
   wipe: { backgroundColor: colors.dangerDot, borderRadius: radius.md, minHeight: 48, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   wipeText: { color: '#FFF', fontFamily: fonts.displayExtra, fontSize: 14 },
   docTitle: { fontSize: 15, fontFamily: fonts.display, color: colors.text, marginBottom: 8 },
-  docRow: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border },
+  docRow: { paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border, flexDirection: 'row', alignItems: 'center', gap: 8 },
   docName: { fontSize: 13, fontFamily: fonts.body, color: colors.text },
   docMeta: { fontSize: 12, fontFamily: fonts.body, color: colors.muted },
   docTypes: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
@@ -319,5 +323,6 @@ const styles = StyleSheet.create({
   chipText: { fontFamily: fonts.body, fontSize: 12, color: colors.muted },
   chipTextOn: { color: '#FFF' },
   upload: { backgroundColor: colors.royalSoft, borderRadius: radius.md, minHeight: 44, alignItems: 'center', justifyContent: 'center', marginTop: 10 },
+  uploadRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   uploadText: { color: colors.navy, fontFamily: fonts.display, fontSize: 13 },
 });

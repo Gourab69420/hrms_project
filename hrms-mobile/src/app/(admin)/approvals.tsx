@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { AppBar, Card, Screen } from '../../components/ui';
 import { useInbox } from '../../services/useHrms';
 import { colors, fonts, radius } from '../../theme';
@@ -8,10 +9,10 @@ import { colors, fonts, radius } from '../../theme';
 export default function Approvals() {
   const { data, isLoading, error, refetch } = useInbox();
   const rows = [
-    { label: 'Leave Requests', n: data.leaves, to: '/(admin)/leaves', icon: '📝' },
-    { label: 'Regularization', n: data.regularizations, to: '/(admin)/regs', icon: '🕘' },
-    { label: 'Helpdesk Tickets', n: data.tickets, to: '/(admin)/tickets', icon: '🎫' },
-    { label: 'Exits Pending', n: data.exits, to: '/(admin)/exits', icon: '🚪' },
+    { label: 'Leave Requests', n: data.leaves, to: '/(admin)/leaves', icon: 'document-text-outline' },
+    { label: 'Regularization', n: data.regularizations, to: '/(admin)/regs', icon: 'time-outline' },
+    { label: 'Helpdesk Tickets', n: data.tickets, to: '/(admin)/tickets', icon: 'ticket-outline' },
+    { label: 'Exits Pending', n: data.exits, to: '/(admin)/exits', icon: 'exit-outline' },
   ] as const;
 
   return (
@@ -31,7 +32,7 @@ export default function Approvals() {
         {rows.map((r) => (
           <Pressable key={r.label} onPress={() => router.push(r.to as never)}>
             <Card style={styles.row}>
-              <Text style={styles.icon}>{r.icon}</Text>
+              <Ionicons name={r.icon as never} size={22} color={colors.navy} />
               <Text style={styles.label}>{r.label}</Text>
               <View style={styles.count}>
                 <Text style={styles.countText}>{r.n}</Text>
