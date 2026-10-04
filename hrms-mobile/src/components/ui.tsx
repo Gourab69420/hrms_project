@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {colors, radius, shadow, type, fonts} from '../theme';
+import { useUnseen } from '../services/seen';
 
 /** Full-screen canvas: matches Stitch #F8F9FD + 16px margins. */
 export function Screen({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
@@ -52,11 +53,7 @@ export function AppBar({
         <Text style={styles.appbarTitle}>{title}</Text>
       </View>
       <View style={styles.appbarRight}>
-        {bellTo && (
-          <Pressable onPress={() => router.push(bellTo as never)} hitSlop={10}>
-            <Ionicons name="notifications-outline" size={22} color={colors.text} />
-          </Pressable>
-        )}
+        {bellTo && <BellDot to={bellTo} />}
         {right}
       </View>
     </View>
@@ -65,6 +62,23 @@ export function AppBar({
 
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   return <View style={[styles.card, style]}>{children}</View>;
+}
+
+/** Notification bell with a yellow dot while unseen announcements/polls exist. */
+export function BellDot({ to }: { to: string }) {
+  const { count, refresh } = useUnseen();
+  return (
+    <Pressable
+      onPress={() => {
+        refresh();
+        router.push(to as never);
+      }}
+      hitSlop={10}
+      style={styles.bellWrap}>
+      <Ionicons name="notifications-outline" size={22} color={colors.text} />
+      {count > 0 && <View style={styles.bellDot} />}
+    </Pressable>
+  );
 }
 
 const pill: Record<string, { bg: string; border: string; text: string; dot: string }> = {
@@ -168,6 +182,18 @@ const styles = StyleSheet.create({
   },
   appbarTitle: { fontSize: 22, fontFamily: fonts.displayExtra, color: colors.text, letterSpacing: -0.3 },
   appbarRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  bellWrap: { padding: 2 },
+  bellDot: {
+    position: 'absolute',
+    top: 1,
+    right: 2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#F59E0B',
+    borderWidth: 2,
+    borderColor: '#FFF',
+  },
   appbarLeft: { flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1 },
   backBtn: { marginLeft: -8, padding: 4 },
   card: {

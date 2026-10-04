@@ -157,7 +157,30 @@ export default function Announcements() {
                 <Text style={styles.closeText}>Close poll</Text>
               </Pressable>
             ) : (
-              <Text style={styles.closed}>Closed</Text>
+              <View style={styles.closedRow}>
+                <Text style={styles.closed}>Closed</Text>
+                <Pressable
+                  onPress={() =>
+                    Alert.alert('Delete poll?', p.question, [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Delete',
+                        style: 'destructive',
+                        onPress: async () => {
+                          try {
+                            const { deletePoll } = await import('../../services/api');
+                            await deletePoll(p.id);
+                            qc.invalidateQueries({ queryKey: ['polls'] });
+                          } catch (e) {
+                            Alert.alert('Failed', e instanceof Error ? e.message : 'Try again');
+                          }
+                        },
+                      },
+                    ])
+                  }>
+                  <Text style={styles.delPoll}>Delete</Text>
+                </Pressable>
+              </View>
             )}
           </Card>
         ))}
@@ -189,6 +212,8 @@ const styles = StyleSheet.create({
   opt: { fontSize: 13, fontFamily: fonts.body, color: colors.text, marginTop: 4 },
   close: { marginTop: 8, alignSelf: 'flex-end', backgroundColor: colors.royalSoft, borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8 },
   closeText: { color: colors.navy, fontFamily: fonts.display, fontSize: 12 },
+  closedRow: { marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  delPoll: { color: colors.dangerDot, fontFamily: fonts.display, fontSize: 12 },
   closed: { marginTop: 8, fontSize: 12, fontFamily: fonts.body, color: colors.muted },
   err: { color: colors.dangerDot, fontFamily: fonts.body },
 });

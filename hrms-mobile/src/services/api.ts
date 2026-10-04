@@ -474,6 +474,7 @@ export const createPoll = (p: { question: string; options: string[] }) =>
   api.post('/polls/', p).then((r) => r.data);
 export const votePoll = (pollId: number, optionId: number) =>
   api.post<Poll>(`/polls/${pollId}/vote`, { option_id: optionId }).then((r) => r.data);
+export const deletePoll = (pollId: number) => api.delete(`/polls/${pollId}`);
 
 export const getMyRegs = () => api.get<Reg[]>('/regularization/my').then((r) => r.data);
 export const getTeamRegs = () => api.get<Reg[]>('/regularization/team').then((r) => r.data);

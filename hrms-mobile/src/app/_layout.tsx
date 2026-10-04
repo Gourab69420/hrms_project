@@ -20,6 +20,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, AppState, Pressable, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useAuth, AuthProvider } from '../store/AuthContext';
+import { NewAnnouncementPopup } from '../components/NewAnnouncementPopup';
 import { lockEnabled, unlock } from '../services/applock';
 import { flushPunches, watchConnectivity } from '../services/offlineQueue';
 import { setupPush } from '../services/push';
@@ -150,6 +151,7 @@ export default function RootLayout() {
           <Stack.Screen name="(employee)" />
         </Stack>
         <Wiring />
+        <NewAnnouncementPopup />
       </AuthProvider>
     </QueryClientProvider>
   );

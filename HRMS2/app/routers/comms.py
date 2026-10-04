@@ -136,3 +136,19 @@ def close_poll(pid: int, db: Session = Depends(get_db)):
     p.active = False
     db.commit()
     return {"ok": True}
+
+
+@router.delete("/polls/{pid}", status_code=204, dependencies=[Depends(hr_admin)])
+def delete_poll(
+    pid: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    from app.audit import log as _log
+    p = db.query(models.Poll).filter(models.Poll.id == pid).first()
+    if not p:
+        raise HTTPException(status_code=404, detail="Not found")
+    db.query(models.PollVote).filter(models.PollVote.poll_id == pid).delete(synchronize_session=False)
+    _log(db, "poll.delete", "poll", pid, current_user.id, p.question[:120])
+    db.delete(p)
+    db.commit()
