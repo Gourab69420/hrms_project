@@ -1,12 +1,15 @@
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { AppBar, Card, Screen } from '../../components/ui';
+import { HolidayCalendar } from '../../components/MonthCalendar';
 import { useHolidays } from '../../services/useHrms';
+import { todayIso } from '../../services/marks';
 import { colors, fonts } from '../../theme';
 
 /** Company holiday calendar (read-only for employees). */
 export default function Holidays() {
   const { data, isLoading, error, refetch } = useHolidays();
-  const upcoming = data.filter((h) => h.date >= new Date().toISOString().slice(0, 10));
+  const today = todayIso();
+  const upcoming = data.filter((h) => h.date >= today);
 
   return (
     <Screen style={{ paddingHorizontal: 0 }}>
@@ -22,6 +25,8 @@ export default function Holidays() {
             <Text style={styles.err}>{error}</Text>
           </Card>
         )}
+        <Text style={styles.h}>Calendar view</Text>
+        <HolidayCalendar data={data} />
         <Text style={styles.h}>Upcoming ({upcoming.length})</Text>
         {upcoming.map((h) => (
           <Card key={`${h.source}-${h.id}-${h.date}`} style={styles.row}>

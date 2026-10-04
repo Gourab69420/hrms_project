@@ -18,7 +18,8 @@ import {
   View,
 } from 'react-native';
 import { AppBar, Card, Screen } from '../../components/ui';
-import { API_URL, api, createHoliday, deleteHoliday, loadToken, syncHolidays, toApiError } from '../../services/api';
+import { HolidayCalendar } from '../../components/MonthCalendar';
+import { API_URL, api, createHoliday, deleteHoliday, loadToken, syncHolidays, toApiError, uploadFile } from '../../services/api';
 import { qError, useHolidays } from '../../services/useHrms';
 import { colors, fonts, radius } from '../../theme';
 
@@ -102,16 +103,14 @@ export default function Holidays() {
           onPress: async () => {
             setUploading(true);
             try {
-              const form = new FormData();
-              form.append('file', {
-                uri: asset.uri,
-                name: asset.name ?? 'holidays.csv',
-                type: asset.mimeType ?? 'text/csv',
-              } as never);
-              // NOTE: no manual Content-Type — axios adds the multipart boundary itself.
-              const res = await api.post('/holidays/upload', form);
+              const res = await uploadFile(
+                '/holidays/upload',
+                asset.uri,
+                asset.name ?? 'holidays.csv',
+                asset.mimeType ?? 'text/csv',
+              );
               qc.invalidateQueries({ queryKey: ['holidays'] });
-              Alert.alert('Replaced', `Holiday set replaced with ${res.data.replaced_with} entries.`);
+              Alert.alert('Replaced', `Holiday set replaced with ${res.replaced_with} entries.`);
             } catch (e) {
               Alert.alert('Upload failed', toApiError(e).message);
             } finally {
@@ -169,6 +168,9 @@ export default function Holidays() {
             </Pressable>
           )}
         </Card>
+
+        <Text style={styles.h}>Calendar view</Text>
+        <HolidayCalendar data={data} />
 
         <Card style={styles.form}>
           <Text style={styles.h}>Set holidays from file (replaces the whole set)</Text>

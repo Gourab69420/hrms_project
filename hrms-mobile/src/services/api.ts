@@ -240,6 +240,41 @@ export async function registerPushToken(expoPushToken: string): Promise<void> {
   await api.post('/auth/push-token', { expo_push_token: expoPushToken });
 }
 
+/**
+ * Device file upload via expo-file-system (NOT axios/fetch FormData):
+ * neither reliably streams React Native {uri,name,type} parts on dev builds.
+ * uploadAsync handles file:// URIs natively.
+ */
+export async function uploadFile(
+  path: string,
+  fileUri: string,
+  fileName: string,
+  mimeType: string,
+  fieldName = 'file',
+): Promise<{ replaced_with?: number; [k: string]: unknown }> {
+  const FileSystem = await import('expo-file-system/legacy');
+  const token = await loadToken();
+  const res = await FileSystem.uploadAsync(`${API_URL}${path}`, fileUri, {
+    httpMethod: 'POST',
+    uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+    fieldName,
+    headers: { Authorization: `Bearer ${token ?? ''}` },
+    parameters: {},
+  });
+  let body: { detail?: string; [k: string]: unknown } | null = null;
+  try {
+    body = JSON.parse(res.body);
+  } catch {
+    body = null;
+  }
+  if (res.status >= 400) {
+    throw new Error(
+      body && typeof body.detail === 'string' ? body.detail : `Upload failed (${res.status})`,
+    );
+  }
+  return (body ?? {}) as { replaced_with?: number; [k: string]: unknown };
+}
+
 export async function me(): Promise<BackendUser> {
   const res = await api.get<BackendUser>('/auth/me');
   return res.data;

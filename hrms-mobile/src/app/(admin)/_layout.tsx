@@ -58,6 +58,7 @@ export default function AdminLayout() {
           ),
         }}
       />
+      <Tabs.Screen name="attendance/[id]" options={{ href: null, title: 'Attendance Log' }} />
       <Tabs.Screen
         name="leaves"
         options={{

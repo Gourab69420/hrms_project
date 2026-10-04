@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {AppBar, Avatar, Card, Screen, SearchBar, StatusPill, initialsOf, toneFor} from '../../components/ui';
@@ -127,7 +128,8 @@ export default function Clock() {
                 ? `In ${a.check_in.slice(11, 16)}`
                 : '— not punched —';
           return (
-            <Card key={e.id} style={styles.row}>
+            <Pressable key={e.id} onPress={() => router.push(`/(admin)/attendance/${e.id}` as never)}>
+            <Card style={styles.row}>
               <Avatar initials={initialsOf(`${e.first_name} ${e.last_name}`)} tone={i} />
               <View style={styles.rowMid}>
                 <Text style={styles.rowName}>
@@ -138,8 +140,12 @@ export default function Clock() {
                 </Text>
                 <Text style={styles.rowShift}>{shift}</Text>
               </View>
-              <StatusPill status={status} />
+              <View style={{ alignItems: 'flex-end', gap: 6 }}>
+                <StatusPill status={status} />
+                <Ionicons name="chevron-forward" size={16} color={colors.muted} />
+              </View>
             </Card>
+            </Pressable>
           );
         })}
         {!loading && !error && emps.length === 0 && (

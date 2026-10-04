@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native';
 import {AppBar, Avatar, Card, Screen, StatusPill, initialsOf, toneFor} from '../../../components/ui';
-import { api, downloadDocUrl, getMyDocs, toApiError, type Doc } from '../../../services/api';
+import { api, downloadDocUrl, getMyDocs, toApiError, uploadFile, type Doc } from '../../../services/api';
 import { useAuth } from '../../../store/AuthContext';
 import { useEmployee } from '../../../services/useHrms';
 import {colors, radius, fonts} from '../../../theme';
@@ -228,14 +228,13 @@ function DocumentsSection({ empId }: { empId: number }) {
     const asset = picked.assets[0];
     setBusy(true);
     try {
-      const form = new FormData();
-      form.append('file', {
-        uri: asset.uri,
-        name: asset.name ?? 'document.pdf',
-        type: asset.mimeType ?? 'application/pdf',
-      } as never);
-      // NOTE: no manual Content-Type — axios adds the multipart boundary itself.
-      await api.post(`/documents/employee/${empId}?doc_type=${encodeURIComponent(docType)}`, form);
+      // FileSystem uploader (axios/fetch FormData parts fail on dev builds).
+      await uploadFile(
+        `/documents/employee/${empId}?doc_type=${encodeURIComponent(docType)}`,
+        asset.uri,
+        asset.name ?? 'document.pdf',
+        asset.mimeType ?? 'application/pdf',
+      );
       await load();
     } catch (e) {
       Alert.alert('Upload failed', toApiError(e).message);

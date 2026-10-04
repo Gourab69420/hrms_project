@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -13,7 +13,9 @@ import {
   View,
 } from 'react-native';
 import { AppBar, Card, Screen, StatusPill } from '../../components/ui';
-import { useMyAttendance, usePunch } from '../../services/useHrms';
+import { DOT, Legend, MonthCalendar } from '../../components/MonthCalendar';
+import { useHolidays, useMyAttendance, useMyLeaves, usePunch } from '../../services/useHrms';
+import { buildMarks, monthOf, todayIso } from '../../services/marks';
 import {colors, radius, fonts} from '../../theme';
 
 /** PAGE 7/11 — My Attendance. One button: tap to punch in, tap again to punch out. */
@@ -55,6 +57,25 @@ export default function EmpAttendance() {
 
   const punchedIn = !!todays && !todays.check_out;
   const presentDays = data.filter((r) => r.status === 'present' || r.status === 'late').length;
+
+  // Calendar view state
+  const today = todayIso();
+  const [month, setMonth] = useState(monthOf(today));
+  const [selected, setSelected] = useState<string | null>(today);
+  const { data: holidays } = useHolidays();
+  const { data: leaves } = useMyLeaves();
+  const marked = useMemo(
+    () =>
+      buildMarks(
+        month,
+        data,
+        leaves.filter((l) => l.status === 'Approved').map((l) => ({ start: l.start, end: l.end })),
+        holidays.map((h) => h.date),
+        today,
+      ),
+    [month, data, leaves, holidays, today],
+  );
+  const selRec = selected ? data.find((r) => r.date === selected) : null;
 
   return (
     <Screen style={{ paddingHorizontal: 0 }}>
@@ -101,6 +122,51 @@ export default function EmpAttendance() {
           </Pressable>
           <Text style={styles.geo}>Tap once to mark attendance — check-in and check-out on the same button.</Text>
         </Card>
+
+        <Text style={styles.section}>Calendar</Text>
+        <MonthCalendar
+          marked={marked}
+          selected={selected}
+          maxDate={today}
+          onMonth={setMonth}
+          onDay={(d) => {
+            setSelected(d);
+            setMonth(monthOf(d));
+          }}
+        />
+        <Legend
+          items={[
+            { color: DOT.present, label: 'Present' },
+            { color: DOT.late, label: 'Late' },
+            { color: DOT.leave, label: 'Leave' },
+            { color: DOT.holiday, label: 'Holiday' },
+            { color: DOT.absent, label: 'Absent' },
+          ]}
+        />
+        {selected && (
+          <Card>
+            <View style={styles.selTop}>
+              <Text style={styles.selDate}>{selected}</Text>
+              {selRec ? (
+                <StatusPill status={selRec.status === 'late' ? 'Late' : selRec.status === 'present' ? 'Present' : 'On Leave'} />
+              ) : (
+                <Text style={styles.selNone}>
+                  {holidays.some((h) => h.date === selected)
+                    ? 'Holiday'
+                    : selected > today
+                      ? 'Upcoming'
+                      : 'No record'}
+                </Text>
+              )}
+            </View>
+            {selRec && (
+              <Text style={styles.selTimes}>
+                In {selRec.check_in?.slice(11, 16) ?? '--:--'}
+                {selRec.check_out ? `  •  Out ${selRec.check_out.slice(11, 16)}` : '  •  open'}
+              </Text>
+            )}
+          </Card>
+        )}
 
         <View style={styles.minis}>
           <Card style={styles.mini}>
@@ -176,6 +242,10 @@ const styles = StyleSheet.create({
   section: { fontSize: 16, fontFamily: fonts.displayExtra, color: colors.text, marginTop: 6 },
   export: { fontSize: 13, color: colors.royal, fontFamily: fonts.display },
   log: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  selTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  selDate: { fontSize: 15, fontFamily: fonts.displayExtra, color: colors.text, fontVariant: ['tabular-nums'] },
+  selNone: { fontSize: 12, fontFamily: fonts.body, color: colors.muted },
+  selTimes: { fontSize: 13, fontFamily: fonts.body, color: colors.text, marginTop: 6, fontVariant: ['tabular-nums'] },
   logLeft: { gap: 3 },
   logDate: { fontSize: 14, fontFamily: fonts.displayExtra, color: colors.text, fontVariant: ['tabular-nums'] },
   logTimes: { fontSize: 12, color: colors.muted, fontVariant: ['tabular-nums'], fontFamily: fonts.body, },
